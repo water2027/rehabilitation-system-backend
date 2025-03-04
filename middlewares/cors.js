@@ -15,4 +15,4 @@ const CorsMiddleware = (req, res, next) => {
 	next();
 };
 
-export { CorsMiddleware }
+module.exports = CorsMiddleware;
