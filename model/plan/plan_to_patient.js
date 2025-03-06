@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../database/db');
 
-const PlanConnectPatient = sequelize.define('plan_connect_patient', {
+const PlanToPatient = sequelize.define('plan_to_patient', {
     plan_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -13,4 +13,4 @@ const PlanConnectPatient = sequelize.define('plan_connect_patient', {
     },
 });
 
-module.exports = PlanConnectPatient;
+module.exports = PlanToPatient;

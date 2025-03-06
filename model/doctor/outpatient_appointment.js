@@ -1,29 +1,24 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../database/db');
 
-const Doctor = sequelize.define('doctor', {
-    doctor_id: {
+const OutpatientAppointment = sequelize.define('outpatient_appointment', {
+    appointment_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    name:{
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    telephone:{
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    auth_id: {
+    patient_id:{
         type: DataTypes.UUID,
         allowNull: false
     },
-    created_at: {
+    doctor_id:{
+        type: DataTypes.UUID,
+        allowNull: false
+    },
+    date:{
         type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
+        allowNull: false
     }
 });
 
-module.exports = Doctor;
+module.exports = OutpatientAppointment;

@@ -1,30 +1,27 @@
 const express = require('express');
+const sequelize = require('./database/db');
 
 const CorsMiddleware = require('./middlewares/cors');
 const AuthMiddleware = require('./middlewares/auth');
 
-const { SuccessResponse, ErrorResponse } = require('./dto/index');
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 app.use(express.json());
 app.use(CorsMiddleware);
 app.use('/auth', AuthMiddleware);
 
-app.get('/', (req, res) => {
-	res.status(200).send('Hello World');
-});
+async function startServer() {
+	try {
+		await sequelize.sync({ alter: true });
+		console.log('Database synchronized successfully');
 
-
-app.post('/auth/test', (req, res) => {
-	const { success } = req.body;
-	if (!success) {
-		ErrorResponse(res, 'error', 500);
-		return;
+		app.listen(PORT, () => {
+			console.log(`Server is running on port ${PORT}`);
+		});
+	} catch (error) {
+		console.error('Unable to start server:', error);
 	}
-	SuccessResponse(res);
-	return;
-});
+}
 
-app.listen(3000, () => {
-	console.log('Server is running on port 3000');
-});
+startServer();

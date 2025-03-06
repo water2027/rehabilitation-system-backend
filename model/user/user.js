@@ -1,15 +1,15 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../database/db');
 
-const Patient = sequelize.define('patient', {
-	patient_id: {
+const User = sequelize.define('user', {
+	id: {
 		type: DataTypes.UUID,
 		defaultValue: DataTypes.UUIDV4,
 		primaryKey: true,
 	},
 	name: {
 		type: DataTypes.STRING,
-		allowNull: false,
+		allowNull: true,
 	},
 	telephone: {
 		type: DataTypes.STRING,
@@ -22,4 +22,4 @@ const Patient = sequelize.define('patient', {
 	},
 });
 
-module.exports = Patient;
+module.exports = User;
