@@ -1,20 +1,24 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../database/db');
 
-const DoctorToPatient = sequelize.define('doctor_to_patient', {
+const SurveyToQuestion = sequelize.define('survey_to_question', {
     connection_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    patient_id:{
+    survey_id:{
         type: DataTypes.UUID,
         allowNull: false
     },
-    doctor_id:{
+    question_id:{
         type: DataTypes.UUID,
+        allowNull: false
+    },
+    display_order:{
+        type: DataTypes.INTEGER,
         allowNull: false
     }
 });
 
-module.exports = DoctorToPatient;
+module.exports = SurveyToQuestion;

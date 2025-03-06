@@ -1,20 +1,21 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../database/db');
 
-const DoctorToPatient = sequelize.define('doctor_to_patient', {
-    connection_id: {
+const Question = sequelize.define('question', {
+    question_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    patient_id:{
+    question_type_id: {
         type: DataTypes.UUID,
         allowNull: false
     },
-    doctor_id:{
-        type: DataTypes.UUID,
-        allowNull: false
+    is_required:{
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
     }
 });
 
-module.exports = DoctorToPatient;
+module.exports = Question;

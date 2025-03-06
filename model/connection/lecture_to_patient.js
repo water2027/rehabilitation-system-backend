@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../database/db');
 
-const DoctorToPatient = sequelize.define('doctor_to_patient', {
+const LectureToPatient = sequelize.define('lecture_to_patient', {
     connection_id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -11,10 +11,10 @@ const DoctorToPatient = sequelize.define('doctor_to_patient', {
         type: DataTypes.UUID,
         allowNull: false
     },
-    doctor_id:{
+    lecture_id:{
         type: DataTypes.UUID,
         allowNull: false
     }
 });
 
-module.exports = DoctorToPatient;
+module.exports = LectureToPatient;
