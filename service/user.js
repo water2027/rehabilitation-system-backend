@@ -5,6 +5,10 @@ const redis = require('../database/redis');
 class UserService {
 	async SendCode(telephone) {
 		const code = generateNumericCode();
+
+		// TODO: 使用短信服务发送验证码
+		console.log('验证码：', code);
+
 		await redis.set(
 			telephone,
 			{
@@ -13,7 +17,6 @@ class UserService {
 			},
 			5 * 60
 		);
-
 	}
 	/**
 	 *
@@ -31,7 +34,7 @@ class UserService {
 
 		const data = JSON.parse(value);
 
-		if(data.type !== 'login') {
+		if (data.type !== 'login') {
 			throw new Error('验证码类型错误', {
 				cause: 0,
 			});
@@ -45,16 +48,22 @@ class UserService {
 
 		let user = await UserRepository.findByTelephone(telephone);
 		if (!user) {
-			user = await UserRepository.createPatient({ telephone });
+			user = await UserRepository.createUser({ telephone });
 		}
-		if (!user.get('name')) {
-			throw new Error('需要完善个人信息', {
-				cause: 3,
+		const level = user.get('level') ? user.get('level') : 0;
+
+		return generateToken(user.get('id'), level);
+	}
+
+	async RefreshToken(id) {
+		const user = UserRepository.findById(id);
+		if (!user) {
+			throw new Error('用户不存在', {
+				cause: 1,
 			});
 		}
-
-		// TODO: 发放token
-		return generateToken(user.get('id'), 'user');
+		const level = user.get('level') ? parseInt(user.get('level')) : 0;
+		return generateToken(id, level);
 	}
 }
 

@@ -91,7 +91,7 @@ class RedisPool {
    * @param {string|number} key - 键
    * @param {any} value - 值
    * @param {number} [expire] - 过期时间（秒）
-   * @returns {Promise<string>} - 操作结果
+   * @returns {Promise<string>} - 操作结果，成功是 OK
    */
 	set(k, v, expire = undefined) {
 		let key = k;
