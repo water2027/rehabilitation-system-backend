@@ -2,12 +2,14 @@ const express = require('express');
 require('dotenv').config();
 const sequelize = require('./database/db');
 require('./model')
+const RunMongoDB = require('./database/mongodb');
 const RegisterRoutes = require('./routes');
 
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
 	try {
+		await RunMongoDB();
 		await sequelize.sync({ alter: true });
 		console.log('Database synchronized successfully');
 		
