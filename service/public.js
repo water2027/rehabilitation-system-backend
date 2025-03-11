@@ -50,7 +50,8 @@ class PublicService {
 	 * @param {string} info.position - 职位
 	 * @param {string} info.introduction - 个人简介
 	 * @param {string} info.name - 名字
-	 * @param {boolean} info.auth_status - 不应该出现的字段
+	 * @param {string} info.department - 科室
+	 * @param {undefined} info.auth_status - 不应该出现的字段
 	 */
 	async DoctorRegister(info) {
 		if (info.auth_status !== undefined && info.auth_status !== null) {

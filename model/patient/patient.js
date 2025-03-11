@@ -16,23 +16,26 @@ const Patient = sequelize.define('patient', {
         allowNull: false,
     },
     height:{
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     weight:{
-        type: DataTypes.STRING,
+        type: DataTypes.DOUBLE,
         allowNull: false,
     },
     allergicHistory:{
         type: DataTypes.STRING,
+        defaultValue:"",
         allowNull: false,
     },
     illnessHistory:{
         type: DataTypes.STRING,
+        defaultValue:"",
         allowNull: false,
     },
     remark:{
         type: DataTypes.STRING,
+        defaultValue:"",
         allowNull: false,
     },
 	name: {

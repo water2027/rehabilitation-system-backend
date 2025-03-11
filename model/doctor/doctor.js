@@ -23,6 +23,10 @@ const Doctor = sequelize.define('doctor', {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
+	department:{
+		type: DataTypes.STRING,
+		allowNull:false,
+	},
 	auth_status: {
 		type: DataTypes.BOOLEAN,
 		allowNull: false,

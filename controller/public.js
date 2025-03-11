@@ -36,11 +36,13 @@ class PublicController {
 	async DoctorRegister(req, res, next) {
 		try {
 			const { id: doctor_id } = req.user;
-			const { gender, position, introduction, name } = req.body;
+			const { gender, position, introduction, department, name } =
+				req.body;
 			const result = await PublicService.DoctorRegister({
 				gender,
 				doctor_id,
 				position,
+				department,
 				introduction,
 				name,
 			});

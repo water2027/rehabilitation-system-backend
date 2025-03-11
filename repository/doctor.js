@@ -83,6 +83,7 @@ class DoctorRepository {
 	 * @param {string} info.position - 职位
 	 * @param {string} info.introduction - 个人简介
 	 * @param {string} info.name - 名字
+	 * @param {string} info.department - 科室
 	 */
 	async createDoctor(info) {
 		return await Doctor.create({ ...info, auth_status: false });
