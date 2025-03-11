@@ -1,5 +1,6 @@
 const Patient = require('../model/patient/patient');
 const User = require('../model/user/user');
+const DoctorToPatient = require('../model/connection/doctor_to_patient');
 
 class PatientRepository {
 	async findDoctor() {
@@ -67,6 +68,33 @@ class PatientRepository {
 			include: [{ model: User, required: true, where: info }],
 		});
 		return patient;
+	}
+
+	/**
+	 * 根据医生id获取对应的患者列表
+	 * @param {Object} info
+	 * @param {number} info.doctorId
+	 * @param {number} info.pageNumber
+	 * @param {number} info.pageSize
+	 * @returns {Promise<Array>}
+	*/
+	async findDoctorPatient(info) {
+		const patients = await Patient.findAll({
+			include:[
+				{
+					model: DoctorToPatient,
+					where: { doctor_id: info.doctorId },
+					required: true,
+				},
+				{
+					model: User,
+					required: true,
+				},
+			],
+			limit: info.pageSize,
+			offset: (info.pageNumber - 1) * info.pageSize,
+		})
+		return patients;
 	}
 
 	async findById(id) {

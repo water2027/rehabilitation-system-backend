@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../database/db');
+// const Patient = require('../patient/patient');
+
 
 const OutpatientAppointment = sequelize.define('outpatient_appointment', {
     appointment_id: {
@@ -20,5 +22,7 @@ const OutpatientAppointment = sequelize.define('outpatient_appointment', {
         allowNull: false
     }
 });
+
+
 
 module.exports = OutpatientAppointment;
