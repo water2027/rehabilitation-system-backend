@@ -11,7 +11,7 @@ function RegisterRoutes(app) {
 	app.use('/api/public', AuthMiddleware(0), require('./public'));
 	app.use('/api/patient', AuthMiddleware(1), require('./patient'));
 	app.use('/api/doctor', AuthMiddleware(2), require('./doctor'));
-	app.use('/api/auth', AuthMiddleware(3), require('./auth'));
+	app.use('/api/admin', AuthMiddleware(3), require('./auth'));
 	
 	app.use('/api', require('./user'));
 	
