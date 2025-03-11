@@ -2,6 +2,9 @@ const { SuccessResponse } = require('../dto');
 const PublicService = require('../service/public');
 
 class PublicController {
+	constructor() {
+		this.PublicService = new PublicService()
+	}
 	async PatientRegister(req, res, next) {
 		try {
 			const { id: patient_id } = req.user;
@@ -16,7 +19,7 @@ class PublicController {
 				name,
 			} = req.body;
 			// 可能需要一个验证函数
-			const result = await PublicService.PatientRegister({
+			const result = await this.PublicService.PatientRegister({
 				gender,
 				birthday,
 				height,
@@ -38,7 +41,7 @@ class PublicController {
 			const { id: doctor_id } = req.user;
 			const { gender, position, introduction, department, name } =
 				req.body;
-			const result = await PublicService.DoctorRegister({
+			const result = await this.PublicService.DoctorRegister({
 				gender,
 				doctor_id,
 				position,
@@ -56,7 +59,7 @@ class PublicController {
 		try {
 			const { id: auth_id } = req.user;
 			const { name } = req.body;
-			const result = await PublicService.AuthRegister({
+			const result = await this.PublicService.AuthRegister({
 				auth_id,
 				name,
 			});
@@ -73,7 +76,7 @@ class PublicController {
 	 */
 	RefreshToken(req, res, next) {
 		const { id } = req.user;
-		PublicService.RefreshToken(id)
+		this.PublicService.RefreshToken(id)
 			.then((token) => {
 				return SuccessResponse(res, token);
 			})

@@ -70,4 +70,4 @@ class AuthRepository {
 	}
 }
 
-module.exports = new AuthRepository();
+module.exports = AuthRepository;

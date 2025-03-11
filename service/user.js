@@ -3,6 +3,9 @@ const { generateToken } = require('../utils/jwt');
 const { generateNumericCode } = require('../utils/vCode');
 const redis = require('../database/redis');
 class UserService {
+	constructor() {
+		this.UserRepository = new UserRepository();
+	}
 	async SendCode(telephone) {
 		const code = generateNumericCode();
 
@@ -46,9 +49,9 @@ class UserService {
 			});
 		}
 
-		let user = await UserRepository.findByTelephone(telephone);
+		let user = await this.UserRepository.findByTelephone(telephone);
 		if (!user) {
-			user = await UserRepository.createUser({ telephone });
+			user = await this.UserRepository.createUser({ telephone });
 		}
 		const level = user.get('level') ? user.get('level') : 0;
 
@@ -56,4 +59,4 @@ class UserService {
 	}
 }
 
-module.exports = new UserService();
+module.exports = UserService;

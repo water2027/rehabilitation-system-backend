@@ -8,6 +8,9 @@ const AuthRepository = require('../repository/auth');
 const PatientRepository = require('../repository/patient');
 
 class PublicService {
+	constructor() {
+		this.PatientRepository = new PatientRepository();
+	}
 	/**
 	 * @param {Object} info - The registration parameters for the doctor
 	 * @param {number} info.gender - 性别0男1女
@@ -34,7 +37,7 @@ class PublicService {
 					cause: 1,
 				});
 			}
-			await PatientRepository.createPatient(info);
+			await this.PatientRepository.createPatient(info);
 			await sequelize.query('COMMIT');
 			return '注册成功，请等待审核';
 		} catch (error) {
@@ -117,4 +120,4 @@ class PublicService {
 	}
 }
 
-module.exports = new PublicService();
+module.exports = PublicService;

@@ -5,6 +5,7 @@ const {
 	TextQuestion,
 	Response,
 } = require('../model/survey/survey');
+const SurveyToPatient = require('../model/connection/survey_to_patient');
 
 class SurveyRepository {
 	/**
@@ -24,7 +25,6 @@ class SurveyRepository {
 	 * @param {string} [questions[].options[].text] - 选项文本
 	 * @param {number} [questions[].min] - 最少选几项 (对于MultipleChoice)
 	 * @param {number} [questions[].max] - 最多选几项 (对于MultipleChoice)
-	 * @returns {Promise<Object>} - Created survey
 	 */
 	async createSurvey(surveyData, questions = []) {
 		try {
@@ -64,7 +64,6 @@ class SurveyRepository {
 	 * @param {string} [questionsData[].options[].text] - 选项文本
 	 * @param {number} [questionsData[].min] - 最少选几项 (对于MultipleChoice)
 	 * @param {number} [questionsData[].max] - 最多选几项 (对于MultipleChoice)
-	 * @returns {Promise<Array<any>>} - Array of created question objects
 	 */
 	async createQuestions(questionsData) {
 		try {
@@ -129,7 +128,6 @@ class SurveyRepository {
 	/**
 	 * Get survey by ID
 	 * @param {string} surveyId - ID of the survey to retrieve
-	 * @returns {Promise<Object|null>} - Survey object
 	 */
 	async getSurveyById(surveyId) {
 		try {
@@ -162,7 +160,6 @@ class SurveyRepository {
 
 	/**
 	 * Get all active surveys
-	 * @returns {Promise<Array<any>>} - Array of active surveys
 	 */
 	async getActiveSurveys() {
 		try {
@@ -197,7 +194,6 @@ class SurveyRepository {
 	 * @param {string} [updateData.questions[].options[].text] - 选项文本
 	 * @param {number} [updateData.questions[].min] - 最少选几项 (对于MultipleChoice)
 	 * @param {number} [updateData.questions[].max] - 最多选几项 (对于MultipleChoice)
-	 * @returns {Promise<Object>} - Updated survey
 	 */
 	async updateSurvey(surveyId, updateData) {
 		try {
@@ -264,7 +260,6 @@ class SurveyRepository {
 	 * @param {string} [questionData.options[].text] - 选项文本
 	 * @param {number} [questionData.min] - 最少选几项 (对于MultipleChoice)
 	 * @param {number} [questionData.max] - 最多选几项 (对于MultipleChoice)
-	 * @returns {Promise<Object>} - Updated survey
 	 */
 	async addQuestionToSurvey(surveyId, questionData) {
 		try {
@@ -292,9 +287,8 @@ class SurveyRepository {
 	 * @param {string} surveyId - ID of the survey
 	 * @param {string} patientId - ID of the patient
 	 * @param {Array<any>} answers - Array of answer objects
-	 * @returns {Promise<Object>} - Created response
 	 */
-	async submitSurveyResponse(surveyId, patientId, answers) {
+	async submitSurveyResponse(patientId, surveyId, answers) {
 		try {
 			// Validate survey exists and is active
 			const survey = await Survey.findOne({
@@ -336,7 +330,6 @@ class SurveyRepository {
 	/**
 	 * 获取一个问卷的答卷
 	 * @param {string} surveyId - ID of the survey
-	 * @returns {Promise<Array<any>>} - Array of responses
 	 */
 	async getSurveyResponses(surveyId) {
 		try {
@@ -351,12 +344,11 @@ class SurveyRepository {
 	}
 
 	/**
-	 * Get patient's responses for a survey
-	 * @param {string} surveyId - ID of the survey
-	 * @param {string} patientId - ID of the patient
-	 * @returns {Promise<Object|null>} - Response object
+	 * 获取患者的问卷结果
+	 * @param {string} patientId - 患者id
+	 * @param {string} surveyId - 问卷id
 	 */
-	async getPatientSurveyResponse(surveyId, patientId) {
+	async getPatientSurveyResponse(patientId, surveyId) {
 		try {
 			const response = await Response.findOne({
 				survey_id: surveyId,
@@ -369,6 +361,15 @@ class SurveyRepository {
 			}
 			throw error;
 		}
+	}
+
+	async addPatientsToSurvey(surveyId, patients) {
+		// 插入患者和问卷的关联
+		const connections = patients.map((patientId) => ({
+			patient_id: patientId,
+			survey_id: surveyId,
+		}));
+		await SurveyToPatient.insertMany(connections);
 	}
 }
 

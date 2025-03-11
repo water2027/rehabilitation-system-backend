@@ -125,4 +125,4 @@ class PatientRepository {
 	}
 }
 
-module.exports = new PatientRepository();
+module.exports = PatientRepository;

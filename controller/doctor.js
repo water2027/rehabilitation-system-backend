@@ -2,13 +2,16 @@ const { SuccessResponse } = require('../dto');
 const DoctorService = require('../service/doctor');
 
 class DoctorController {
+	constructor() {
+		this.DoctorService = new DoctorService();
+	}
 	async getAuthPatient(req, res, next) {
 		try {
 			const { pageNumber, pageSize } = req.body;
 			if (pageSize < 1 || pageNumber < 1) {
 				throw new Error('Invalid page number or page size');
 			}
-			const result = await DoctorService.getAuthPatient({
+			const result = await this.DoctorService.getAuthPatient({
 				pageNumber,
 				pageSize,
 			});
@@ -28,7 +31,7 @@ class DoctorController {
 			if (pageSize < 1 || pageNumber < 1) {
 				throw new Error('Invalid page number or page size');
 			}
-			const result = await DoctorService.getDoctorPatient({
+			const result = await this.DoctorService.getDoctorPatient({
 				doctorId,
 				pageNumber,
 				pageSize,

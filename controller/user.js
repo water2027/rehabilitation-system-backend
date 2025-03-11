@@ -2,6 +2,9 @@ const { SuccessResponse, ErrorResponse } = require('../dto/index');
 const UserService = require('../service/user');
 
 class UserController {
+	constructor() {
+		this.UserService = new UserService();
+	}
 	SendCode(req, res, next) {
 		const { telephone } = req.body;
 		// 正则表达式判断手机号
@@ -12,7 +15,7 @@ class UserController {
 		) {
 			return ErrorResponse(res, '手机号不正确');
 		}
-		UserService.SendCode(telephone)
+		this.UserService.SendCode(telephone)
 			.then(() => {
 				return SuccessResponse(res);
 			})
@@ -30,7 +33,7 @@ class UserController {
 		) {
 			return ErrorResponse(res, '手机号或验证码不正确');
 		}
-		UserService.Login(telephone, vCode)
+		this.UserService.Login(telephone, vCode)
 			.then((token) => {
 				return SuccessResponse(res, token);
 			})

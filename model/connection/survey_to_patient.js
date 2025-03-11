@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../database/db');
+const Patient = require('../patient/patient');
 
 const SurveyToPatient = sequelize.define('survey_to_patient', {
 	connection_id: {
@@ -20,6 +21,14 @@ const SurveyToPatient = sequelize.define('survey_to_patient', {
 		allowNull: false,
 		defaultValue: DataTypes.NOW,
 	},
+});
+
+Patient.hasMany(SurveyToPatient, {
+	foreignKey: 'patient_id',
+});
+
+SurveyToPatient.belongsTo(Patient, {
+	foreignKey: 'patient_id',
 });
 
 module.exports = SurveyToPatient;

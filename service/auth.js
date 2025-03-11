@@ -4,6 +4,9 @@ const DoctorRepository = require('../repository/doctor');
 const AuthRepository = require('../repository/auth');
 const PatientRepository = require('../repository/patient');
 class AuthService {
+	constructor() {
+		this.PatientRepository = new PatientRepository();
+	}
 	/**
 	 * 获取所有未认证医生
 	 * @param {Object} info
@@ -11,7 +14,7 @@ class AuthService {
 	 * @param {number} info.pageSize
 	 */
 	async getAllUnauthPatient(info) {
-		const patients = await PatientRepository.findUnauthPatient(info);
+		const patients = await this.PatientRepository.findUnauthPatient(info);
 		return patients;
 	}
 
@@ -64,7 +67,7 @@ class AuthService {
 	async authPatient(info) {
 		await sequelize.query('START TRANSACTION');
 		try {
-			const patient = await PatientRepository.findById(info.id);
+			const patient = await this.PatientRepository.findById(info.id);
 			if (!patient) {
 				throw new Error('Patient not found');
 			}
@@ -126,4 +129,4 @@ class AuthService {
 	}
 }
 
-module.exports = new AuthService();
+module.exports = AuthService;

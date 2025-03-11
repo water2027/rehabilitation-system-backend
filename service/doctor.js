@@ -3,6 +3,10 @@
 // const UserRepository = require('../repository/user');
 const PatientRepository = require('../repository/patient');
 class DoctorService {
+	constructor(SurveyService = undefined) {
+		this.PatientRepository = new PatientRepository()
+		this.SurveyService = SurveyService;
+	}
 	/**
 	 * 获取所有已认证医生
 	 * @param {Object} info
@@ -10,7 +14,7 @@ class DoctorService {
 	 * @param {number} info.pageSize
 	 */
 	async getAuthPatient(info) {
-		const patients = await PatientRepository.findAuthPatient(info);
+		const patients = await this.PatientRepository.findAuthPatient(info);
 		return patients;
 	}
 
@@ -23,9 +27,9 @@ class DoctorService {
 	 * @returns {Promise<Array<any>>}
 	*/
 	async getDoctorPatient(info) {
-		const patients = await PatientRepository.findDoctorPatient(info);
+		const patients = await this.PatientRepository.findDoctorPatient(info);
 		return patients;
 	}
 }
 
-module.exports = new DoctorService();
+module.exports = DoctorService;
