@@ -76,7 +76,6 @@ class PatientRepository {
 	 * @param {number} info.doctorId
 	 * @param {number} info.pageNumber
 	 * @param {number} info.pageSize
-	 * @returns {Promise<Array>}
 	*/
 	async findDoctorPatient(info) {
 		const patients = await Patient.findAll({
@@ -97,6 +96,11 @@ class PatientRepository {
 		return patients;
 	}
 
+	/**
+	 * 
+	 * @param {string} id 
+	 * @returns 
+	 */
 	async findById(id) {
 		const patient = await Patient.findByPk(id, {
 			include: [{ model: User, required: true }],

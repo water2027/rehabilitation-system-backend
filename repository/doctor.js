@@ -69,6 +69,11 @@ class DoctorRepository {
 		return doctor;
 	}
 
+	/**
+	 * 
+	 * @param {string} id 
+	 * @returns 
+	 */
 	async findById(id) {
 		const doctor = await Doctor.findByPk(id, {
 			include: [{ model: User, required: true }],

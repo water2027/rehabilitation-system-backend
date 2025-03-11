@@ -48,6 +48,11 @@ class AuthRepository {
 		return doctor;
 	}
 
+	/**
+	 * 
+	 * @param {string} id 
+	 * @returns 
+	 */
 	async findById(id) {
 		const doctor = await Auth.findByPk(id, {
 			include: [{ model: User, required: true }],

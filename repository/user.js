@@ -9,6 +9,11 @@ class UserRepository {
 		return await User.findOne({ where: { telephone } });
 	}
 
+	/**
+	 * 
+	 * @param {string} id 
+	 * @returns 
+	 */
 	async findById(id) {
 		return await User.findByPk(id);
 	}

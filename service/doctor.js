@@ -20,7 +20,7 @@ class DoctorService {
 	 * @param {number} info.doctorId
 	 * @param {number} info.pageNumber
 	 * @param {number} info.pageSize
-	 * @returns {Promise<Array>}
+	 * @returns {Promise<Array<any>>}
 	*/
 	async getDoctorPatient(info) {
 		const patients = await PatientRepository.findDoctorPatient(info);

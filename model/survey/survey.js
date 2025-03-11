@@ -32,13 +32,40 @@ const SurveySchema = new Schema(
 			default: () => new mongoose.Types.ObjectId(),
 			index: true,
 		},
-		title: { type: String, required: true },
-		description: { type: String, required: true },
-		start_date: { type: Date, required: true },
-		end_date: { type: Date, required: true },
-		created_at: { type: Date, default: Date.now },
-		is_active: { type: Boolean, default: true },
-		questions: [{ type: BaseQuestionSchema, ref: 'Question' }],
+		doctor_id: {
+			type: String,
+			required: true,
+		},
+		title: {
+			type: String,
+			required: true,
+		},
+		description: {
+			type: String,
+			required: true,
+		},
+		start_date: {
+			type: Date,
+			required: true,
+		},
+		end_date: {
+			type: Date,
+			required: true,
+		},
+		created_at: {
+			type: Date,
+			default: Date.now,
+		},
+		is_active: {
+			type: Boolean,
+			default: true,
+		},
+		questions: [
+			{
+				type: BaseQuestionSchema,
+				ref: 'Question',
+			},
+		],
 	},
 	{ timestamps: true }
 );

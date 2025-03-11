@@ -10,6 +10,7 @@ class SurveyRepository {
 	/**
 	 * Create a new survey
 	 * @param {Object} surveyData - 问卷基础信息
+	 * @param {string} surveyData.doctor_id - 创建者
 	 * @param {string} surveyData.title - 标题
 	 * @param {string} surveyData.description - 描述
 	 * @param {string} surveyData.start_date - 开始时间
@@ -39,27 +40,31 @@ class SurveyRepository {
 			});
 
 			if (questions.length > 0) {
+				// @ts-ignore
 				survey.questions = await this.createQuestions(questions);
 			}
 
 			await survey.save();
 			return survey;
 		} catch (error) {
-			throw new Error(`Failed to create survey: ${error.message}`);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 
 	/**
 	 * Create questions of different types
-	 * @param {Object[]} questions - 问卷问题数组
-	 * @param {string} questions[].title - 问题题干
-	 * @param {'SingleChoice'| 'MultipleChoice'| 'Text'} questions[].question_type - 问题类型
-	 * @param {boolean} [questions[].is_required=true] - 是否必填，默认为true
-	 * @param {Object[]} [questions[].options] - 选择题选项
-	 * @param {string} [questions[].options[].text] - 选项文本
-	 * @param {number} [questions[].min] - 最少选几项 (对于MultipleChoice)
-	 * @param {number} [questions[].max] - 最多选几项 (对于MultipleChoice)
-	 * @returns {Promise<Array>} - Array of created question objects
+	 * @param {Object[]} questionsData - 问卷问题数组
+	 * @param {string} questionsData[].title - 问题题干
+	 * @param {'SingleChoice'| 'MultipleChoice'| 'Text'} questionsData[].question_type - 问题类型
+	 * @param {boolean} [questionsData[].is_required=true] - 是否必填，默认为true
+	 * @param {Object[]} [questionsData[].options] - 选择题选项
+	 * @param {string} [questionsData[].options[].text] - 选项文本
+	 * @param {number} [questionsData[].min] - 最少选几项 (对于MultipleChoice)
+	 * @param {number} [questionsData[].max] - 最多选几项 (对于MultipleChoice)
+	 * @returns {Promise<Array<any>>} - Array of created question objects
 	 */
 	async createQuestions(questionsData) {
 		try {
@@ -114,27 +119,50 @@ class SurveyRepository {
 
 			return questions;
 		} catch (error) {
-			throw new Error(`Failed to create questions: ${error.message}`);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 
 	/**
 	 * Get survey by ID
 	 * @param {string} surveyId - ID of the survey to retrieve
-	 * @returns {Promise<Object>} - Survey object
+	 * @returns {Promise<Object|null>} - Survey object
 	 */
 	async getSurveyById(surveyId) {
 		try {
 			const survey = await Survey.findOne({ survey_id: surveyId });
 			return survey;
 		} catch (error) {
-			throw new Error(`Failed to get survey: ${error.message}`);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
+		}
+	}
+
+	/**
+	 * 
+	 * @param {string} doctorId 
+	 * @returns 
+	 */
+	async getSurveyByDoctorId(doctorId) {
+		try {
+			const survey = await Survey.find({ doctor_id: doctorId });
+			return survey;
+		} catch (error) {
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 
 	/**
 	 * Get all active surveys
-	 * @returns {Promise<Array>} - Array of active surveys
+	 * @returns {Promise<Array<any>>} - Array of active surveys
 	 */
 	async getActiveSurveys() {
 		try {
@@ -145,7 +173,10 @@ class SurveyRepository {
 			});
 			return surveys;
 		} catch (error) {
-			throw new Error(`Failed to get active surveys: ${error.message}`);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 
@@ -155,9 +186,9 @@ class SurveyRepository {
 	 * @param {Object} updateData - Data to update
 	 * @param {string} updateData.title 标题
 	 * @param {string} updateData.description 描述
-	 * @param {string} updateData.start_date 开始时间
-	 * @param {string} updateData.end_date 结束时间
-	 * @param {string} updateData.is_active 是否启用
+	 * @param {Date} updateData.start_date 开始时间
+	 * @param {Date} updateData.end_date 结束时间
+	 * @param {boolean} updateData.is_active 是否启用
 	 * @param {Object[]} updateData.questions - 问卷问题数组
 	 * @param {string} updateData.questions[].title - 问题题干
 	 * @param {'SingleChoice'| 'MultipleChoice'| 'Text'} updateData.questions[].question_type - 问题类型
@@ -189,6 +220,7 @@ class SurveyRepository {
 			// Handle updating questions if provided
 			if (updateData.questions) {
 				// Replace existing questions with new ones
+				// @ts-ignore
 				survey.questions = await this.createQuestions(
 					updateData.questions
 				);
@@ -197,7 +229,10 @@ class SurveyRepository {
 			await survey.save();
 			return survey;
 		} catch (error) {
-			throw new Error(`Failed to update survey: ${error.message}`);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 
@@ -211,7 +246,10 @@ class SurveyRepository {
 			const result = await Survey.deleteOne({ survey_id: surveyId });
 			return result.deletedCount > 0;
 		} catch (error) {
-			throw new Error(`Failed to delete survey: ${error.message}`);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 
@@ -242,9 +280,10 @@ class SurveyRepository {
 			await survey.save();
 			return survey;
 		} catch (error) {
-			throw new Error(
-				`Failed to add question to survey: ${error.message}`
-			);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 
@@ -252,7 +291,7 @@ class SurveyRepository {
 	 * 提交问卷
 	 * @param {string} surveyId - ID of the survey
 	 * @param {string} patientId - ID of the patient
-	 * @param {Array} answers - Array of answer objects
+	 * @param {Array<any>} answers - Array of answer objects
 	 * @returns {Promise<Object>} - Created response
 	 */
 	async submitSurveyResponse(surveyId, patientId, answers) {
@@ -287,23 +326,27 @@ class SurveyRepository {
 			await response.save();
 			return response;
 		} catch (error) {
-			throw new Error(
-				`Failed to submit survey response: ${error.message}`
-			);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 
 	/**
 	 * 获取一个问卷的答卷
 	 * @param {string} surveyId - ID of the survey
-	 * @returns {Promise<Array>} - Array of responses
+	 * @returns {Promise<Array<any>>} - Array of responses
 	 */
 	async getSurveyResponses(surveyId) {
 		try {
 			const responses = await Response.find({ survey_id: surveyId });
 			return responses;
 		} catch (error) {
-			throw new Error(`Failed to get survey responses: ${error.message}`);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 
@@ -311,7 +354,7 @@ class SurveyRepository {
 	 * Get patient's responses for a survey
 	 * @param {string} surveyId - ID of the survey
 	 * @param {string} patientId - ID of the patient
-	 * @returns {Promise<Object>} - Response object
+	 * @returns {Promise<Object|null>} - Response object
 	 */
 	async getPatientSurveyResponse(surveyId, patientId) {
 		try {
@@ -321,9 +364,10 @@ class SurveyRepository {
 			});
 			return response;
 		} catch (error) {
-			throw new Error(
-				`Failed to get patient survey response: ${error.message}`
-			);
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
 		}
 	}
 }
