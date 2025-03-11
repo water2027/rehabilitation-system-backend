@@ -1,5 +1,6 @@
 const {
 	Survey,
+	Question,
 	SingleChoiceQuestion,
 	MultipleChoiceQuestion,
 	TextQuestion,
@@ -29,6 +30,7 @@ class SurveyRepository {
 	async createSurvey(surveyData, questions = []) {
 		try {
 			const survey = new Survey({
+				doctor_id: surveyData.doctor_id,
 				title: surveyData.title,
 				description: surveyData.description,
 				start_date: surveyData.start_date,
@@ -39,10 +41,11 @@ class SurveyRepository {
 						: true,
 			});
 
-			if (questions.length > 0) {
-				// @ts-ignore
-				survey.questions = await this.createQuestions(questions);
-			}
+			const insertedQuestions = await this.createQuestions(
+				surveyData.doctor_id,
+				questions
+			);
+			survey.questions = insertedQuestions.map((q) => q._id);
 
 			await survey.save();
 			return survey;
@@ -65,32 +68,35 @@ class SurveyRepository {
 	 * @param {number} [questionsData[].min] - 最少选几项 (对于MultipleChoice)
 	 * @param {number} [questionsData[].max] - 最多选几项 (对于MultipleChoice)
 	 */
-	async createQuestions(questionsData) {
+	async createQuestions(id, questionsData) {
 		try {
 			const questions = [];
 
 			for (const questionData of questionsData) {
 				let question;
 
+				const commonFields = {
+					title: questionData.title,
+					is_required:
+						questionData.is_required !== undefined
+							? questionData.is_required
+							: true,
+					created_by: id,
+				};
+
+				console.log(commonFields.created_by);
+
 				switch (questionData.question_type) {
 					case 'SingleChoice':
 						question = new SingleChoiceQuestion({
-							title: questionData.title,
-							is_required:
-								questionData.is_required !== undefined
-									? questionData.is_required
-									: true,
+							...commonFields,
 							options: questionData.options || [],
 						});
 						break;
 
 					case 'MultipleChoice':
 						question = new MultipleChoiceQuestion({
-							title: questionData.title,
-							is_required:
-								questionData.is_required !== undefined
-									? questionData.is_required
-									: true,
+							...commonFields,
 							options: questionData.options || [],
 							min: questionData.min,
 							max: questionData.max,
@@ -99,11 +105,7 @@ class SurveyRepository {
 
 					case 'Text':
 						question = new TextQuestion({
-							title: questionData.title,
-							is_required:
-								questionData.is_required !== undefined
-									? questionData.is_required
-									: true,
+							...commonFields,
 						});
 						break;
 
@@ -116,7 +118,9 @@ class SurveyRepository {
 				questions.push(question);
 			}
 
-			return questions;
+			const result = await Question.insertMany(questions);
+
+			return result;
 		} catch (error) {
 			if (error instanceof Error) {
 				throw new Error(`Failed to create questions: ${error.message}`);
@@ -131,7 +135,11 @@ class SurveyRepository {
 	 */
 	async getSurveyById(surveyId) {
 		try {
-			const survey = await Survey.findOne({ survey_id: surveyId });
+			const survey = await Survey.findById(surveyId).populate({
+				path: 'questions',
+				model: 'Question',
+			});
+
 			return survey;
 		} catch (error) {
 			if (error instanceof Error) {
@@ -142,13 +150,15 @@ class SurveyRepository {
 	}
 
 	/**
-	 * 
-	 * @param {string} doctorId 
-	 * @returns 
+	 *
+	 * @param {string} doctorId
+	 * @returns
 	 */
-	async getSurveyByDoctorId(doctorId) {
+	async getSurveyByDoctorId(doctorId, info) {
 		try {
-			const survey = await Survey.find({ doctor_id: doctorId });
+			const survey = await Survey.find({ doctor_id: doctorId })
+				.skip((info.pageNumber - 1) * info.pageSize)
+				.limit(info.pageSize);
 			return survey;
 		} catch (error) {
 			if (error instanceof Error) {
@@ -177,8 +187,8 @@ class SurveyRepository {
 		}
 	}
 
-	/**
-	 * Update a survey
+	/** Update a survey
+	 *
 	 * @param {string} surveyId - ID of the survey to update
 	 * @param {Object} updateData - Data to update
 	 * @param {string} updateData.title 标题
@@ -186,18 +196,10 @@ class SurveyRepository {
 	 * @param {Date} updateData.start_date 开始时间
 	 * @param {Date} updateData.end_date 结束时间
 	 * @param {boolean} updateData.is_active 是否启用
-	 * @param {Object[]} updateData.questions - 问卷问题数组
-	 * @param {string} updateData.questions[].title - 问题题干
-	 * @param {'SingleChoice'| 'MultipleChoice'| 'Text'} updateData.questions[].question_type - 问题类型
-	 * @param {boolean} [updateData.questions[].is_required=true] - 是否必填，默认为true
-	 * @param {Object[]} [updateData.questions[].options] - 选择题选项
-	 * @param {string} [updateData.questions[].options[].text] - 选项文本
-	 * @param {number} [updateData.questions[].min] - 最少选几项 (对于MultipleChoice)
-	 * @param {number} [updateData.questions[].max] - 最多选几项 (对于MultipleChoice)
 	 */
 	async updateSurvey(surveyId, updateData) {
 		try {
-			const survey = await Survey.findOne({ survey_id: surveyId });
+			const survey = await Survey.findById(surveyId);
 
 			if (!survey) {
 				throw new Error('Survey not found');
@@ -212,15 +214,6 @@ class SurveyRepository {
 			if (updateData.end_date) survey.end_date = updateData.end_date;
 			if (updateData.is_active !== undefined)
 				survey.is_active = updateData.is_active;
-
-			// Handle updating questions if provided
-			if (updateData.questions) {
-				// Replace existing questions with new ones
-				// @ts-ignore
-				survey.questions = await this.createQuestions(
-					updateData.questions
-				);
-			}
 
 			await survey.save();
 			return survey;
@@ -249,28 +242,51 @@ class SurveyRepository {
 		}
 	}
 
-	/**
-	 * 添加一个问题到已有的问卷
-	 * @param {string} surveyId - ID of the survey
-	 * @param {Object} questionData - Question data to add
-	 * @param {string} questionData.title - 问题题干
-	 * @param {'SingleChoice'| 'MultipleChoice'| 'Text'} questionData.question_type - 问题类型
-	 * @param {boolean} [questionData.is_required=true] - 是否必填，默认为true
-	 * @param {Object[]} [questionData.options] - 选择题选项
-	 * @param {string} [questionData.options[].text] - 选项文本
-	 * @param {number} [questionData.min] - 最少选几项 (对于MultipleChoice)
-	 * @param {number} [questionData.max] - 最多选几项 (对于MultipleChoice)
-	 */
-	async addQuestionToSurvey(surveyId, questionData) {
+	async findQuestionById(questionId) {
 		try {
-			const survey = await Survey.findOne({ survey_id: surveyId });
+			const question = await Question.findById(questionId);
+
+			if (!question) {
+				throw new Error(`Question with ID ${questionId} not found`);
+			}
+
+			return question;
+		} catch (error) {
+			if (error.name === 'CastError') {
+				throw new Error(`Invalid question ID format: ${questionId}`);
+			}
+			throw new Error(`Failed to get question: ${error.message}`);
+		}
+	}
+
+	async addNewQuestionToSurvey(id, surveyId, questions) {
+		try {
+			const survey = await Survey.findById(surveyId);
+			const insertedQuestions = await this.createQuestions(id, questions);
+			survey.questions = insertedQuestions.map((q) => q._id);
+			await survey.save();
+		} catch (error) {
+			if (error instanceof Error) {
+				throw new Error(`Failed to create questions: ${error.message}`);
+			}
+			throw error;
+		}
+	}
+
+	/** 将一个已有的问题添加到已有的问卷
+	 *
+	 * @param {string} surveyId - ID of the survey
+	 * @param {string[]} questions - 已有的问题id数组
+	 */
+	async addOldQuestionToSurvey(surveyId, questions) {
+		try {
+			const survey = await Survey.findById(surveyId);
 
 			if (!survey) {
 				throw new Error('Survey not found');
 			}
 
-			const questions = await this.createQuestions([questionData]);
-			survey.questions.push(questions[0]);
+			survey.questions = questions;
 
 			await survey.save();
 			return survey;
@@ -292,7 +308,7 @@ class SurveyRepository {
 		try {
 			// Validate survey exists and is active
 			const survey = await Survey.findOne({
-				survey_id: surveyId,
+				_id: surveyId,
 				is_active: true,
 				start_date: { $lte: new Date() },
 				end_date: { $gte: new Date() },
@@ -370,6 +386,24 @@ class SurveyRepository {
 			survey_id: surveyId,
 		}));
 		await SurveyToPatient.insertMany(connections);
+	}
+
+	async getSurveyListForPatient(patientId, info) {
+		// 获取患者的问卷列表id
+		const connections = await SurveyToPatient.find({
+			patient_id: patientId,
+		});
+		// 根据问卷id获取问卷详情
+		const surveyIds = connections.map((survey) => survey.survey_id);
+		if (surveyIds.length === 0) {
+			return [];
+		}
+		const surveyList = await Survey.find({
+			_id: { $in: surveyIds },
+		})
+			.skip((info.pageNumber - 1) * info.pageSize)
+			.limit(info.pageSize);
+		return surveyList;
 	}
 }
 

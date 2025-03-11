@@ -13,10 +13,9 @@ const OptionSchema = new Schema({
 // 基础问题模式
 const BaseQuestionSchema = new Schema(
 	{
-		question_id: {
-			type: Schema.Types.ObjectId,
-			default: () => new mongoose.Types.ObjectId(),
-			index: true,
+		created_by: {
+			type: String,
+			required: true,
 		},
 		title: String,
 		is_required: { type: Boolean, default: true },
@@ -24,14 +23,33 @@ const BaseQuestionSchema = new Schema(
 	{ discriminatorKey: 'question_type', timestamps: true }
 );
 
+// 为不同类型的问题创建区分器
+const Question = mongoose.model('Question', BaseQuestionSchema);
+
+// 单选题
+const SingleChoiceQuestion = Question.discriminator(
+	'SingleChoice',
+	new Schema({
+		options: [OptionSchema],
+	})
+);
+
+// 多选题
+const MultipleChoiceQuestion = Question.discriminator(
+	'MultipleChoice',
+	new Schema({
+		options: [OptionSchema],
+		max: Number,
+		min: Number,
+	})
+);
+
+// 文本问题
+const TextQuestion = Question.discriminator('Text', new Schema({}));
+
 // 问卷模式
 const SurveySchema = new Schema(
 	{
-		survey_id: {
-			type: Schema.Types.ObjectId,
-			default: () => new mongoose.Types.ObjectId(),
-			index: true,
-		},
 		doctor_id: {
 			type: String,
 			required: true,
@@ -62,7 +80,7 @@ const SurveySchema = new Schema(
 		},
 		questions: [
 			{
-				type: BaseQuestionSchema,
+				type: Schema.Types.ObjectId,
 				ref: 'Question',
 			},
 		],
@@ -72,30 +90,6 @@ const SurveySchema = new Schema(
 
 // 创建Survey模型
 const Survey = mongoose.model('Survey', SurveySchema);
-
-// 为不同类型的问题创建区分器
-const Question = mongoose.model('Question', BaseQuestionSchema);
-
-// 单选题
-const SingleChoiceQuestion = Question.discriminator(
-	'SingleChoice',
-	new Schema({
-		options: [OptionSchema],
-	})
-);
-
-// 多选题
-const MultipleChoiceQuestion = Question.discriminator(
-	'MultipleChoice',
-	new Schema({
-		options: [OptionSchema],
-		max: Number,
-		min: Number,
-	})
-);
-
-// 文本问题
-const TextQuestion = Question.discriminator('Text', new Schema({}));
 
 const ResponseSchema = new Schema(
 	{
@@ -125,6 +119,7 @@ const Response = mongoose.model('Response', ResponseSchema);
 
 module.exports = {
 	Survey,
+	Question,
 	SingleChoiceQuestion,
 	MultipleChoiceQuestion,
 	TextQuestion,

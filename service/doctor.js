@@ -3,9 +3,8 @@
 // const UserRepository = require('../repository/user');
 const PatientRepository = require('../repository/patient');
 class DoctorService {
-	constructor(SurveyService = undefined) {
+	constructor() {
 		this.PatientRepository = new PatientRepository()
-		this.SurveyService = SurveyService;
 	}
 	/**
 	 * 获取所有已认证医生
