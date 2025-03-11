@@ -1,6 +1,5 @@
 const { ErrorResponse } = require('../dto/index');
 const { verifyToken } = require('../utils/jwt');
-const redis = require('../database/redis');
 
 /**
  * 
@@ -20,13 +19,11 @@ const AuthMiddleware = (authLevel) => {
 		// Bearer xxx
 		const token = authorization.slice(7);
 		try {
-			const { id } = verifyToken(token);
-			let level = await redis.get(id)
-			if (!level||level <= authLevel - 1) {
-				// 打去认证
+			let { id, level } = verifyToken(token);
+			level = parseInt(level);
+			if(level <= authLevel - 1) {
 				return ErrorResponse(res, '无权限', 3);
 			}
-			level = parseInt(level);
 			req.user = { id, level };
 			next();
 		} catch (error) {

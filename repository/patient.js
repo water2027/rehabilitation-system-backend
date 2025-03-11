@@ -1,9 +1,9 @@
-const Doctor = require('../model/doctor/doctor');
+const Patient = require('../model/patient/patient');
 const User = require('../model/user/user');
 
-class DoctorRepository {
+class PatientRepository {
 	async findDoctor() {
-		const doctors = await Doctor.findAll({
+		const patients = await Patient.findAll({
 			include: [
 				{
 					model: User,
@@ -11,7 +11,7 @@ class DoctorRepository {
 				},
 			],
 		});
-		return doctors;
+		return patients;
 	}
 
 	/**
@@ -20,8 +20,8 @@ class DoctorRepository {
 	 * @param {number} info.pageNumber
 	 * @param {number} info.pageSize
 	 */
-	async findAuthDoctor(info) {
-		const doctors = await Doctor.findAll({
+	async findAuthPatient(info) {
+		const patients = await Patient.findAll({
 			where: { auth_status: true },
 			include: [
 				{
@@ -32,17 +32,17 @@ class DoctorRepository {
 			limit: info.pageSize,
 			offset: (info.pageNumber - 1) * info.pageSize,
 		});
-		return doctors;
+		return patients;
 	}
 
 	/**
-	 * 获取所有未认证医生
+	 * 获取所有未认证患者
 	 * @param {Object} info
 	 * @param {number} info.pageNumber
 	 * @param {number} info.pageSize
 	 */
-	async findUnauthDoctor(info) {
-		const doctors = await Doctor.findAll({
+	async findUnauthPatient(info) {
+		const patients = await Patient.findAll({
 			where: { auth_status: false },
 			include: [
 				{
@@ -53,7 +53,7 @@ class DoctorRepository {
 			limit: info.pageSize,
 			offset: (info.pageNumber - 1) * info.pageSize,
 		});
-		return doctors;
+		return patients;
 	}
 
 	/**
@@ -62,31 +62,35 @@ class DoctorRepository {
 	 * @param {string} info.telephone
 	 */
 	async findByTelephone(info) {
-		const doctor = await Doctor.findOne({
+		const patient = await Patient.findOne({
 			where: info,
 			include: [{ model: User, required: true, where: info }],
 		});
-		return doctor;
+		return patient;
 	}
 
 	async findById(id) {
-		const doctor = await Doctor.findByPk(id, {
+		const patient = await Patient.findByPk(id, {
 			include: [{ model: User, required: true }],
 		});
-		return doctor;
+		return patient;
 	}
 
 	/**
 	 * @param {Object} info - The registration parameters for the doctor
 	 * @param {number} info.gender - 性别0男1女
-	 * @param {string} info.doctor_id - 用户/医生id
-	 * @param {string} info.position - 职位
-	 * @param {string} info.introduction - 个人简介
+     * @param {string} info.birthday - 生日
+     * @param {string} info.height - 身高
+     * @param {string} info.weight - 体重
+	 * @param {string} info.allergicHistory - 过敏史
+	 * @param {string} info.illnessHistory - 病史
+	 * @param {string} info.remark - 其它情况说明
+	 * @param {string} info.patient_id - 用户/患者id
 	 * @param {string} info.name - 名字
 	 */
-	async createDoctor(info) {
-		return await Doctor.create({ ...info, auth_status: false });
+	async createPatient(info) {
+		return await Patient.create({ ...info, auth_status: false });
 	}
 }
 
-module.exports = new DoctorRepository();
+module.exports = new PatientRepository();

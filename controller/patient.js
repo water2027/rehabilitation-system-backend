@@ -1,14 +1,14 @@
 const { SuccessResponse } = require('../dto');
-const DoctorService = require('../service/doctor');
+const PatientService = require('../service/patient');
 
-class DoctorController {
-	async getAuthPatient(req, res, next) {
+class PatientController {
+	async getAllAuthDoctor(req, res, next) {
 		try {
 			const { pageNumber, pageSize } = req.body;
 			if (pageSize < 1 || pageNumber < 1) {
 				throw new Error('Invalid page number or page size');
 			}
-			const result = await DoctorService.getAuthPatient({
+			const result = await PatientService.getAllAuthDoctor({
 				pageNumber,
 				pageSize,
 			});
@@ -19,4 +19,4 @@ class DoctorController {
 	}
 }
 
-module.exports = new DoctorController();
+module.exports = new PatientController();

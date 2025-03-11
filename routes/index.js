@@ -8,15 +8,13 @@ const ErrorHandler = require('../middlewares/errorHandler');
 function RegisterRoutes(app) {
 	app.use(express.json());
 	app.use(CorsMiddleware);
-	app.use('/api/public', AuthMiddleware(0));
-	app.use('/api/patient', AuthMiddleware(1));
-	app.use('/api/doctor', AuthMiddleware(2));
-	app.use('/api/auth', AuthMiddleware(3));
+	app.use('/api/public', AuthMiddleware(0), require('./public'));
+	app.use('/api/patient', AuthMiddleware(1), require('./patient'));
+	app.use('/api/doctor', AuthMiddleware(2), require('./doctor'));
+	app.use('/api/auth', AuthMiddleware(3), require('./auth'));
 	
 	app.use('/api', require('./user'));
-	app.use('/api', require('./doctor'));
-	app.use('/api', require('./auth'))
-
+	
 	// 404
 	app.use((req, res) => {
 		return ErrorResponse(res, 'Not Found', 0);

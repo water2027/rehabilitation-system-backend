@@ -19,14 +19,6 @@ const Doctor = sequelize.define('doctor', {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
-	workingExperience: {
-		type: DataTypes.STRING,
-		allowNull: false,
-	},
-	professionalExperience: {
-		type: DataTypes.STRING,
-		allowNull: false,
-	},
 	introduction: {
 		type: DataTypes.STRING,
 		allowNull: false,

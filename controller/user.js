@@ -38,22 +38,6 @@ class UserController {
 				next(err);
 			});
 	}
-
-	/**
-	 * 如果token没过期，发放新token
-	 *
-	 *
-	 */
-	RefreshToken(req, res, next) {
-		const { id } = req.user;
-		UserService.RefreshToken(id)
-			.then((token) => {
-				return SuccessResponse(res, token);
-			})
-			.catch((err) => {
-				next(err);
-			});
-	}
 }
 
 module.exports = new UserController();

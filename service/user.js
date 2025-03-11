@@ -54,17 +54,6 @@ class UserService {
 
 		return generateToken(user.get('id'), level);
 	}
-
-	async RefreshToken(id) {
-		const user = UserRepository.findById(id);
-		if (!user) {
-			throw new Error('用户不存在', {
-				cause: 1,
-			});
-		}
-		const level = user.get('level') ? parseInt(user.get('level')) : 0;
-		return generateToken(id, level);
-	}
 }
 
 module.exports = new UserService();
