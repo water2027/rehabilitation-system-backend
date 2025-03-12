@@ -4,11 +4,14 @@ const Doctor = require('./doctor/doctor')
 const Auth = require('./auth/auth')
 
 const DoctorToPatient = require('./connection/doctor_to_patient')
+const SurveyToPatient = require('./connection/survey_to_patient')
+
 module.exports = {
     User,
     Patient,
     Doctor,
     Auth,
 
-    DoctorToPatient
+    DoctorToPatient,
+    SurveyToPatient
 }

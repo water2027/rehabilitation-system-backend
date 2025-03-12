@@ -84,8 +84,6 @@ class SurveyRepository {
 					created_by: id,
 				};
 
-				console.log(commonFields.created_by);
-
 				switch (questionData.question_type) {
 					case 'SingleChoice':
 						question = new SingleChoiceQuestion({
@@ -232,7 +230,7 @@ class SurveyRepository {
 	 */
 	async deleteSurvey(surveyId) {
 		try {
-			const result = await Survey.deleteOne({ survey_id: surveyId });
+			const result = await Survey.deleteOne({ _id: surveyId });
 			return result.deletedCount > 0;
 		} catch (error) {
 			if (error instanceof Error) {
@@ -261,9 +259,13 @@ class SurveyRepository {
 
 	async addNewQuestionToSurvey(id, surveyId, questions) {
 		try {
-			const survey = await Survey.findById(surveyId);
+			console.log(id);
 			const insertedQuestions = await this.createQuestions(id, questions);
-			survey.questions = insertedQuestions.map((q) => q._id);
+			const survey = await Survey.findByIdAndUpdate(
+				surveyId,
+				{ $push: { questions: { $each: insertedQuestions } } },
+				{ new: true }
+			);
 			await survey.save();
 		} catch (error) {
 			if (error instanceof Error) {
@@ -280,13 +282,11 @@ class SurveyRepository {
 	 */
 	async addOldQuestionToSurvey(surveyId, questions) {
 		try {
-			const survey = await Survey.findById(surveyId);
-
-			if (!survey) {
-				throw new Error('Survey not found');
-			}
-
-			survey.questions = questions;
+			const survey = await Survey.findByIdAndUpdate(
+				surveyId,
+				{ $push: { questions: { $each: questions } } },
+				{ new: true }
+			);
 
 			await survey.save();
 			return survey;
@@ -302,19 +302,29 @@ class SurveyRepository {
 	 * 提交问卷
 	 * @param {string} surveyId - ID of the survey
 	 * @param {string} patientId - ID of the patient
-	 * @param {Array<any>} answers - Array of answer objects
+	 * @param {Object[]} answers - 答卷
+	 * @param {string} answers[].question_id
+	 * @param {string} answers[].question_type
+	 * @param {string} answers[].question_type
+	 * @param {string} [answers[].single_choice_answer]
+	 * @param {string[]} [answers[].multiple_choice_answers]
+	 * @param {string} [answers[].text_answer]
 	 */
 	async submitSurveyResponse(patientId, surveyId, answers) {
 		try {
-			// Validate survey exists and is active
-			const survey = await Survey.findOne({
-				_id: surveyId,
-				is_active: true,
-				start_date: { $lte: new Date() },
-				end_date: { $gte: new Date() },
-			});
-
-			if (!survey) {
+			console.log(surveyId);
+			const survey = await Survey.findById(surveyId);
+			console.log(survey);
+			const now = new Date();
+			const start = new Date(survey.start_date);
+			const end = new Date(survey.end_date);
+			if (
+				!(
+					survey.is_active &&
+					now.getTime() < end.getTime() &&
+					now.getTime() > start.getTime()
+				)
+			) {
 				throw new Error('Survey not found or not active');
 			}
 
@@ -337,7 +347,7 @@ class SurveyRepository {
 			return response;
 		} catch (error) {
 			if (error instanceof Error) {
-				throw new Error(`Failed to create questions: ${error.message}`);
+				throw new Error(`Failed to answer: ${error.message}`);
 			}
 			throw error;
 		}
@@ -349,7 +359,12 @@ class SurveyRepository {
 	 */
 	async getSurveyResponses(surveyId) {
 		try {
-			const responses = await Response.find({ survey_id: surveyId });
+			const responses = await Response.find({
+				survey_id: surveyId,
+			}).populate({
+				path: 'answers.question_id',
+				// No need to specify model here as it's defined in the schema ref
+			});
 			return responses;
 		} catch (error) {
 			if (error instanceof Error) {
@@ -385,14 +400,17 @@ class SurveyRepository {
 			patient_id: patientId,
 			survey_id: surveyId,
 		}));
-		await SurveyToPatient.insertMany(connections);
+
+		await SurveyToPatient.bulkCreate(connections);
 	}
 
 	async getSurveyListForPatient(patientId, info) {
+		console.log(patientId);
 		// 获取患者的问卷列表id
-		const connections = await SurveyToPatient.find({
+		const connections = await SurveyToPatient.findAll({
 			patient_id: patientId,
 		});
+		console.log(connections);
 		// 根据问卷id获取问卷详情
 		const surveyIds = connections.map((survey) => survey.survey_id);
 		if (surveyIds.length === 0) {
@@ -404,6 +422,14 @@ class SurveyRepository {
 			.skip((info.pageNumber - 1) * info.pageSize)
 			.limit(info.pageSize);
 		return surveyList;
+	}
+
+	async existPatientAndSurvey(patient_id, survey_id) {
+		const result = await SurveyToPatient.count({
+			patient_id,
+			survey_id,
+		});
+		return result > 0;
 	}
 }
 

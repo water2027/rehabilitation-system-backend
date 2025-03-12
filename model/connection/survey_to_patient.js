@@ -15,12 +15,7 @@ const SurveyToPatient = sequelize.define('survey_to_patient', {
 	survey_id: {
 		type: DataTypes.UUID,
 		allowNull: false,
-	},
-	created_at: {
-		type: DataTypes.DATE,
-		allowNull: false,
-		defaultValue: DataTypes.NOW,
-	},
+	}
 });
 
 Patient.hasMany(SurveyToPatient, {

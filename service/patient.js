@@ -2,7 +2,8 @@
 const DoctorRepository = require('../repository/doctor');
 // const AuthRepository = require('../repository/auth');
 class PatientService {
-	constructor() {
+	constructor(SurveyService) {
+		this.SurveyService = SurveyService
 		this.DoctorRepository = new DoctorRepository();
 	}
 	/**

@@ -17,7 +17,7 @@ function RegisterRoutes(app) {
 	
 	// 404
 	app.use((req, res) => {
-		return ErrorResponse(res, 'Not Found', 0);
+		return ErrorResponse(res, 'Not Found', -100);
 	});
 	app.use(ErrorHandler);
 }

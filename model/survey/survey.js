@@ -3,10 +3,6 @@ const Schema = mongoose.Schema;
 
 // 选项模式（用于多选/单选类问题）
 const OptionSchema = new Schema({
-	option_id: {
-		type: Schema.Types.ObjectId,
-		default: () => new mongoose.Types.ObjectId(),
-	},
 	text: String,
 });
 
@@ -98,12 +94,7 @@ const ResponseSchema = new Schema(
 		created_at: { type: Date, default: Date.now },
 		answers: [
 			{
-				question_id: { type: Schema.Types.ObjectId, required: true },
-				question_type: {
-					type: String,
-					enum: ['SingleChoice', 'MultipleChoice', 'Text'],
-					required: true,
-				},
+				question_id: { type: Schema.Types.ObjectId, ref:'Question' },
 				single_choice_answer: { type: Schema.Types.ObjectId },
 				multiple_choice_answers: [{ type: Schema.Types.ObjectId }],
 				text_answer: { type: String },

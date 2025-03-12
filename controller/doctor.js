@@ -6,7 +6,6 @@ class DoctorController {
 	constructor() {
 		this.DoctorService = new DoctorService();
 		this.SurveyService = new SurveyService();
-		console.log(this.SurveyService)
 	}
 	async getAuthPatient(req, res, next) {
 		try {
@@ -50,7 +49,6 @@ class DoctorController {
 	 */
 	async createSurvey(req, res, next) {
 		try {
-			console.log(this)
 			const { id } = req.user;
 			const { data, questions } = req.body;
 			const result = await this.SurveyService.createSurvey(
@@ -70,10 +68,10 @@ class DoctorController {
 	async addNewQuestions(req, res, next) {
 		try {
 			const { id } = req.user;
-			const { surveyId, questions } = req.body;
-			const result = this.SurveyService.addNewQuestions(
+			const { survey_id, questions } = req.body;
+			const result = await this.SurveyService.addNewQuestions(
 				id,
-				surveyId,
+				survey_id,
 				questions
 			);
 			return SuccessResponse(res, result);
@@ -124,7 +122,7 @@ class DoctorController {
 		try {
 			const { id } = req.user;
 			const { surveyId } = req.body;
-			const result = this.SurveyService.getSurveyResult(id, surveyId);
+			const result = await this.SurveyService.getSurveyResult(id, surveyId);
 			return SuccessResponse(res, result);
 		} catch (err) {
 			next(err);
@@ -138,7 +136,7 @@ class DoctorController {
 		try {
 			const { id } = req.user;
 			const { surveyId } = req.body;
-			const result = this.SurveyService.deleteSurvey(id, surveyId);
+			const result = await this.SurveyService.deleteSurvey(id, surveyId);
 			return SuccessResponse(res, result);
 		} catch (err) {
 			next(err);
@@ -166,7 +164,7 @@ class DoctorController {
 		try {
 			const { id } = req.user;
 			const { surveyId, patients } = req.body;
-			const result = this.SurveyService.addPatientsToSurvey(
+			const result = await this.SurveyService.addPatientsToSurvey(
 				id,
 				surveyId,
 				patients

@@ -1,4 +1,6 @@
 const SurveyRepository = require('../repository/survey');
+const { mongoWithTransaction } = require('../utils/withTransaction');
+
 class SurveyService {
 	constructor() {
 		this.SurveyRepository = new SurveyRepository();
@@ -46,12 +48,23 @@ class SurveyService {
 	 * @param {number} [questions[].max] - 最多选几项 (对于MultipleChoice)
 	 */
 	async addNewQuestions(id, surveyId, questions) {
-		const survey = await this.SurveyRepository.getSurveyById(surveyId);
-		if (survey.doctor_id !== id) {
-			throw new Error('无权限');
-		}
-		await this.SurveyRepository.addNewQuestionToSurvey(id, surveyId, questions);
-		return 'OK';
+		const execute = mongoWithTransaction();
+		return execute(async () => {
+			const survey = await this.SurveyRepository.getSurveyById(surveyId);
+			if (!survey) {
+				throw new Error('问卷不存在');
+			}
+			if (survey.doctor_id !== id) {
+				throw new Error('无权限');
+			}
+			console.log(id);
+			await this.SurveyRepository.addNewQuestionToSurvey(
+				id,
+				surveyId,
+				questions
+			);
+			return 'OK';
+		});
 	}
 
 	async addOldQuestions(id, surveyId, questions) {
@@ -73,7 +86,6 @@ class SurveyService {
 			doctorId,
 			info
 		);
-		console.log(surveyList);
 		return surveyList;
 	}
 
@@ -92,6 +104,16 @@ class SurveyService {
 		return result;
 	}
 
+	/** 根据问卷id获取问卷详情
+	 *
+	 * @param {string} surveyId
+	 * @returns
+	 */
+	async getSurveyById(surveyId) {
+		const survey = await this.SurveyRepository.getSurveyById(surveyId);
+		return survey;
+	}
+
 	/** 删除问卷
 	 *
 	 * @param {string} surveyId
@@ -99,11 +121,16 @@ class SurveyService {
 	 */
 	async deleteSurvey(id, surveyId) {
 		const survey = await this.SurveyRepository.getSurveyById(surveyId);
+		console.log(survey);
+		if (!survey) {
+			throw new Error('问卷不存在');
+		}
 		if (survey.doctor_id !== id) {
 			throw new Error('无权限');
 		}
-		await this.SurveyRepository.deleteSurvey(surveyId);
-		return 'OK';
+		return (await this.SurveyRepository.deleteSurvey(surveyId))
+			? 'OK'
+			: 'FAIL';
 	}
 
 	/** 更新问卷，只会覆盖传入的字段
@@ -133,7 +160,7 @@ class SurveyService {
 	 * @param {string[]} patients - 患者id数组
 	 */
 	async addPatientsToSurvey(id, surveyId, patients) {
-		const survey = await this.SurveyRepository.getSurveyById(id);
+		const survey = await this.SurveyRepository.getSurveyById(surveyId);
 		if (survey.doctor_id != id) {
 			throw new Error('无权限');
 		}
@@ -141,19 +168,10 @@ class SurveyService {
 		return 'OK';
 	}
 
-	/** 根据问卷id获取问卷详情
-	 *
-	 * @param {string} surveyId
-	 * @returns
-	 */
-	async getSurveyById(surveyId) {
-		const survey = await this.SurveyRepository.getSurveyById(surveyId);
-		return survey;
-	}
-
 	// patient
 
 	async getSurveyListForPatient(id, pageNumber, pageSize) {
+		console.log(id)
 		const result = await this.SurveyRepository.getSurveyListForPatient(id, {
 			pageNumber,
 			pageSize,
@@ -162,10 +180,12 @@ class SurveyService {
 	}
 
 	async getSurveyForPatient(id, surveyId) {
-		const survey = await this.SurveyRepository.getSurveyById(surveyId);
-		if (survey.patient_id !== id) {
+		const isExist = await this.SurveyRepository.existPatientAndSurvey(id, surveyId);
+		console.log(isExist)
+		if (!isExist) {
 			throw new Error('无权限');
 		}
+		const survey = await this.SurveyRepository.getSurveyById(surveyId);
 		return survey;
 	}
 
@@ -174,6 +194,10 @@ class SurveyService {
 	 * @param {string} id - 患者id
 	 * @param {string} surveyId - 问卷id
 	 * @param {Object[]} answers - 答卷
+	 * @param {string} answers[].question_id
+	 * @param {string} [answers[].single_choice_answer]
+	 * @param {string[]} [answers[].multiple_choice_answers]
+	 * @param {string} [answers[].text_answer]
 	 * @returns
 	 */
 	async submitSurvey(id, surveyId, answers) {
