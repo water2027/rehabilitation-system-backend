@@ -29,6 +29,7 @@ class UserService {
 	 */
 	async Login(telephone, vCode) {
 		const value = await redis.get(telephone);
+		await redis.del(telephone)
 		if (!value) {
 			throw new Error('验证码已过期', {
 				cause: 0,
@@ -55,7 +56,9 @@ class UserService {
 		}
 		const level = user.get('level') ? user.get('level') : 0;
 
-		return generateToken(user.get('id'), level);
+		const token = generateToken(user.get('id'), level)
+
+		return token;
 	}
 }
 
