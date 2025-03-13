@@ -121,7 +121,7 @@ class PatientRepository {
 	 * @param {string} info.name - 名字
 	 */
 	async createPatient(info) {
-		return await Patient.create({ ...info, auth_status: false });
+		return await Patient.create({ ...info });
 	}
 }
 

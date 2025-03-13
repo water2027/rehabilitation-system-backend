@@ -42,11 +42,6 @@ const Patient = sequelize.define('patient', {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},
-	auth_status: {
-		type: DataTypes.BOOLEAN,
-		allowNull: false,
-		defaultValue: false,
-	},
 });
 
 User.hasOne(Patient, {

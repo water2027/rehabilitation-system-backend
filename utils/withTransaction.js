@@ -1,4 +1,19 @@
 const mongoose = require('mongoose');
+const sequelize = require('../database/db');
+
+function sequelizeWithTransaction() {
+	return async function (fn) {
+		await sequelize.query('START TRANSACTION');
+		try {
+			const result = await fn();
+			await sequelize.query('COMMIT');
+			return result;
+		} catch (error) {
+			await sequelize.query('ROLLBACK');
+			throw error;
+		}
+	};
+}
 
 function mongoWithTransaction() {
 	return async function (fn) {
@@ -18,5 +33,4 @@ function mongoWithTransaction() {
 	};
 }
 
-
-module.exports = { mongoWithTransaction }
+module.exports = { sequelizeWithTransaction, mongoWithTransaction };

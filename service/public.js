@@ -1,6 +1,6 @@
 const { generateToken } = require('../utils/jwt');
 
-const sequelize = require('../database/db');
+const { sequelizeWithTransaction } = require('../utils/withTransaction');
 
 const DoctorRepository = require('../repository/doctor');
 const UserRepository = require('../repository/user');
@@ -10,6 +10,7 @@ const PatientRepository = require('../repository/patient');
 class PublicService {
 	constructor() {
 		this.PatientRepository = new PatientRepository();
+		this.UserRepository = new UserRepository();
 	}
 	/**
 	 * @param {Object} info - The registration parameters for the doctor
@@ -24,26 +25,19 @@ class PublicService {
 	 * @param {string} info.name - 名字
 	 */
 	async PatientRegister(info) {
-		if (info.auth_status !== undefined && info.auth_status !== null) {
-			throw new Error('auth_status should not be provided', {
-				cause: 1,
-			});
-		}
-		await sequelize.query('START TRANSACTION');
-		try {
-			const user = await UserRepository.findById(info.patient_id);
+		const execute = sequelizeWithTransaction();
+		return await execute(async () => {
+			const user = await this.UserRepository.findById(info.patient_id);
 			if (!user) {
 				throw new Error('User not found', {
 					cause: 1,
 				});
 			}
 			await this.PatientRepository.createPatient(info);
-			await sequelize.query('COMMIT');
-			return '注册成功，请等待审核';
-		} catch (error) {
-			await sequelize.query('ROLLBACK');
-			throw error;
-		}
+
+			user.level = 1;
+			await user.save();
+		});
 	}
 	/**
 	 *
@@ -57,26 +51,14 @@ class PublicService {
 	 * @param {undefined} info.auth_status - 不应该出现的字段
 	 */
 	async DoctorRegister(info) {
-		if (info.auth_status !== undefined && info.auth_status !== null) {
-			throw new Error('auth_status should not be provided', {
+		const user = await this.UserRepository.findById(info.doctor_id);
+		if (!user) {
+			throw new Error('User not found', {
 				cause: 1,
 			});
 		}
-		await sequelize.query('START TRANSACTION');
-		try {
-			const user = await UserRepository.findById(info.doctor_id);
-			if (!user) {
-				throw new Error('User not found', {
-					cause: 1,
-				});
-			}
-			await DoctorRepository.createDoctor(info);
-			await sequelize.query('COMMIT');
-			return '注册成功，请等待审核';
-		} catch (error) {
-			await sequelize.query('ROLLBACK');
-			throw error;
-		}
+		await DoctorRepository.createDoctor(info);
+		return '注册成功，请等待审核';
 	}
 
 	/**
@@ -86,30 +68,18 @@ class PublicService {
 	 * @param {string} info.name - 用户名
 	 */
 	async AuthRegister(info) {
-		if (info.auth_status !== undefined && info.auth_status !== null) {
-			throw new Error('auth_status should not be provided', {
+		const user = await this.UserRepository.findById(info.auth_id);
+		if (!user) {
+			throw new Error('User not found', {
 				cause: 1,
 			});
 		}
-		await sequelize.query('START TRANSACTION');
-		try {
-			const user = await UserRepository.findById(info.auth_id);
-			if (!user) {
-				throw new Error('User not found', {
-					cause: 1,
-				});
-			}
-			await AuthRepository.createAuth(info);
-			await sequelize.query('COMMIT');
-			return '注册成功，请等待审核';
-		} catch (error) {
-			await sequelize.query('ROLLBACK');
-			throw error;
-		}
+		await AuthRepository.createAuth(info);
+		return '注册成功，请等待审核';
 	}
 
 	async RefreshToken(id) {
-		const user = await UserRepository.findById(id);
+		const user = await this.UserRepository.findById(id);
 		if (!user) {
 			throw new Error('用户不存在', {
 				cause: 1,
