@@ -4,7 +4,7 @@ const { sequelizeWithTransaction } = require('../utils/withTransaction');
 
 const DoctorRepository = require('../repository/doctor');
 const UserRepository = require('../repository/user');
-const AuthRepository = require('../repository/auth');
+const AuthRepository = require('../repository/admin');
 const PatientRepository = require('../repository/patient');
 
 class PublicService {

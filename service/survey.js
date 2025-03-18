@@ -1,9 +1,8 @@
-const SurveyRepository = require('../repository/survey');
 const { mongoWithTransaction } = require('../utils/withTransaction');
 
 class SurveyService {
-	constructor() {
-		this.SurveyRepository = new SurveyRepository();
+	constructor(SurveyRepository) {
+		this.SurveyRepository = SurveyRepository;
 	}
 	// doctor
 

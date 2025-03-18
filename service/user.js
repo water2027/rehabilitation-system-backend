@@ -1,10 +1,9 @@
-const UserRepository = require('../repository/user');
 const { generateToken } = require('../utils/jwt');
 const { generateNumericCode } = require('../utils/vCode');
 const redis = require('../database/redis');
 class UserService {
-	constructor() {
-		this.UserRepository = new UserRepository();
+	constructor(UserRepository) {
+		this.UserRepository = UserRepository;
 	}
 	async SendCode(telephone) {
 		const code = generateNumericCode();

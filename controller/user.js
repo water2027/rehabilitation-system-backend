@@ -1,9 +1,8 @@
 const { SuccessResponse, ErrorResponse } = require('../dto/index');
-const UserService = require('../service/user');
 
 class UserController {
-	constructor() {
-		this.UserService = new UserService();
+	constructor(UserService) {
+		this.UserService = UserService;
 	}
 	SendCode(req, res, next) {
 		const { telephone } = req.body;
@@ -43,4 +42,4 @@ class UserController {
 	}
 }
 
-module.exports = new UserController();
+module.exports = UserController;

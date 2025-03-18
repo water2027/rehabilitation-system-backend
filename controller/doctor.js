@@ -1,11 +1,10 @@
 const { SuccessResponse } = require('../dto');
-const DoctorService = require('../service/doctor');
-const SurveyService = require('../service/survey');
+
 
 class DoctorController {
-	constructor() {
-		this.DoctorService = new DoctorService();
-		this.SurveyService = new SurveyService();
+	constructor(DoctorService, SurveyService) {
+		this.DoctorService = DoctorService;
+		this.SurveyService = SurveyService;
 	}
 	async getAuthPatient(req, res, next) {
 		try {
@@ -189,4 +188,4 @@ class DoctorController {
 	}
 }
 
-module.exports = new DoctorController();
+module.exports = DoctorController;

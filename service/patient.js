@@ -1,10 +1,6 @@
-// const sequelize = require('../database/db');
-const DoctorRepository = require('../repository/doctor');
-// const AuthRepository = require('../repository/auth');
 class PatientService {
-	constructor(SurveyService) {
-		this.SurveyService = SurveyService
-		this.DoctorRepository = new DoctorRepository();
+	constructor(DoctorRepository) {
+		this.DoctorRepository = DoctorRepository;
 	}
 	/**
 	 * 获取所有已认证医生

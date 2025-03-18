@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../../database/db');
 const User = require('../user/user');
 
-const Auth = sequelize.define('auth', {
+const Admin = sequelize.define('auth', {
 	auth_id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
@@ -14,14 +14,14 @@ const Auth = sequelize.define('auth', {
 	},
 });
 
-User.hasOne(Auth, {
+User.hasOne(Admin, {
 	foreignKey: 'auth_id',
 	sourceKey: 'id',
 });
 
-Auth.belongsTo(User, {
+Admin.belongsTo(User, {
 	foreignKey: 'auth_id',
 	targetKey: 'id',
 });
 
-module.exports = Auth;
+module.exports = Admin;

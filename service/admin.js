@@ -1,11 +1,10 @@
 const sequelize = require('../database/db');
 
-const DoctorRepository = require('../repository/doctor');
-const AuthRepository = require('../repository/auth');
-const PatientRepository = require('../repository/patient');
-class AuthService {
-	constructor() {
-		this.PatientRepository = new PatientRepository();
+class AdminService {
+	constructor(AdminRepository, DoctorRepository, PatientRepository) {
+		this.AdminRepository = AdminRepository;
+		this.DoctorRepository = DoctorRepository;
+		this.PatientRepository = PatientRepository;
 	}
 	/**
 	 * 获取所有未认证医生
@@ -25,7 +24,7 @@ class AuthService {
 	 * @param {number} info.pageSize
 	 */
 	async getAllUnauthDoctor(info) {
-		const doctors = await DoctorRepository.findUnauthDoctor(info);
+		const doctors = await this.DoctorRepository.findUnauthDoctor(info);
 		return doctors;
 	}
 
@@ -35,9 +34,9 @@ class AuthService {
 	 * @param {number} info.pageNumber
 	 * @param {number} info.pageSize
 	 */
-	async getAllUnauthAuth(info) {
-		const auths = await AuthRepository.findUnauthAuth(info);
-		return auths;
+	async getAllUnauthAdmin(info) {
+		const admins = await this.AdminRepository.findUnauthAdmin(info);
+		return admins;
 	}
 
 	/**
@@ -47,7 +46,7 @@ class AuthService {
 	 * @param {number} info.pageSize
 	 */
 	async getAllAuthDoctor(info) {
-		const doctors = await DoctorRepository.findAuthDoctor(info);
+		const doctors = await this.DoctorRepository.findAuthDoctor(info);
 		return doctors;
 	}
 
@@ -55,7 +54,7 @@ class AuthService {
 	 * 获取所有医生
 	 */
 	async getAllDoctor(info) {
-		const doctors = await DoctorRepository.findDoctor(info);
+		const doctors = await this.DoctorRepository.findDoctor(info);
 		return doctors;
 	}
 
@@ -90,7 +89,7 @@ class AuthService {
 	async authDoctor(info) {
 		await sequelize.query('START TRANSACTION');
 		try {
-			const doctor = await DoctorRepository.findById(info.id);
+			const doctor = await this.DoctorRepository.findById(info.id);
 			if (!doctor) {
 				throw new Error('Doctor not found');
 			}
@@ -110,17 +109,17 @@ class AuthService {
 	 * @param {Object} info
 	 * @param {string} info.id
 	 */
-	async authAuth(info) {
+	async authAdmin(info) {
 		await sequelize.query('START TRANSACTION');
 		try {
-			const auth = await AuthRepository.findById(info.id);
-			if (!auth) {
-				throw new Error('Auth not found');
+			const admin = await this.AdminRepository.findById(info.id);
+			if (!admin) {
+				throw new Error('admin not found');
 			}
-			auth.auth_status = true;
-			await auth.save();
-			auth.user.level = 3;
-			await auth.user.save();
+			admin.auth_status = true;
+			await admin.save();
+			admin.user.level = 3;
+			await admin.user.save();
 			await sequelize.query('COMMIT');
 		} catch (err) {
 			await sequelize.query('ROLLBACK');
@@ -129,4 +128,4 @@ class AuthService {
 	}
 }
 
-module.exports = AuthService;
+module.exports = AdminService;

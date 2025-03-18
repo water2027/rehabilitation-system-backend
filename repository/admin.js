@@ -1,9 +1,9 @@
-const Auth = require('../model/auth/auth');
+const Admin = require('../model/admin/admin');
 const User = require('../model/user/user');
 
-class AuthRepository {
-	async findAuth() {
-		const doctors = await Auth.findAll({
+class AdminRepository {
+	async findAdmin() {
+		const doctors = await Admin.findAll({
 			include: [
 				{
 					model: User,
@@ -20,8 +20,8 @@ class AuthRepository {
 	 * @param {number} info.pageNumber
 	 * @param {number} info.pageSize
 	 */
-	async findUnauthAuth(info) {
-		const doctors = await Auth.findAll({
+	async findUnauthAdmin(info) {
+		const doctors = await Admin.findAll({
 			where: { auth_status: false },
 			include: [
 				{
@@ -41,7 +41,7 @@ class AuthRepository {
 	 * @param {string} info.telephone
 	 */
 	async findByTelephone(info) {
-		const doctor = await Auth.findOne({
+		const doctor = await Admin.findOne({
 			where: info,
 			include: [{ model: User, required: true, where: info }],
 		});
@@ -54,7 +54,7 @@ class AuthRepository {
 	 * @returns 
 	 */
 	async findById(id) {
-		const doctor = await Auth.findByPk(id, {
+		const doctor = await Admin.findByPk(id, {
 			include: [{ model: User, required: true }],
 		});
 		return doctor;
@@ -65,9 +65,9 @@ class AuthRepository {
 	 * @param {string} info.auth_id - 用户/医生id
 	 * @param {string} info.name - 名字
 	 */
-	async createAuth(info) {
-		return await Auth.create({ ...info, auth_status: false });
+	async createAdmin(info) {
+		return await Admin.create({ ...info, auth_status: false });
 	}
 }
 
-module.exports = AuthRepository;
+module.exports = AdminRepository;
