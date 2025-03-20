@@ -8,13 +8,12 @@ const jwt = require('jsonwebtoken');
  * 	- `${value}d`
  * @returns {string} token
  */
-function generateToken(id, level, expiresIn = '30d') {
-	if (!id || level === undefined || level === null || level < 0) {
+function generateToken(id, expiresIn = '30d') {
+	if (!id) {
 		throw new Error('id and level are required');
 	}
 	const payload = {
 		id,
-		level,
 		type: 'access',
 		iat: Math.floor(Date.now() / 1000),
 	}

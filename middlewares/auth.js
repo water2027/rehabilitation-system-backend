@@ -1,14 +1,14 @@
 const { ErrorResponse } = require('../dto/index');
-const { verifyToken } = require('../utils/jwt');
+const eventBus = require('../utils/eventBus');
 
 /**
- * 
+ *
  * @param {number} authLevel 表示需要几级的权限
  * 0 未实名
  * 1 用户
  * 2 医生
  * 3 管理员
- * @returns 
+ * @returns
  */
 const AuthMiddleware = (authLevel) => {
 	return async (req, res, next) => {
@@ -19,23 +19,20 @@ const AuthMiddleware = (authLevel) => {
 		// Bearer xxx
 		const token = authorization.slice(7);
 		try {
-			let { id, level } = verifyToken(token);
-			level = parseInt(level);
-			if(level <= authLevel - 1) {
+			const resp = {};
+			await eventBus.emit('auth:verify', { token }, resp);
+			const { id, level } = resp;
+			if (!id) {
+				return ErrorResponse(res, '无效的 Token', 1);
+			}
+			if (level <= authLevel - 1) {
 				return ErrorResponse(res, '无权限', 3);
 			}
 			req.user = { id, level };
 			next();
 		} catch (error) {
-			switch (error.name) {
-				case 'TokenExpiredError':
-					return ErrorResponse(res, 'token过期', 1);
-				case 'JsonWebTokenError':
-					return ErrorResponse(res, '无效的 Token', 1);
-				default:
-					console.error(error);
-					return ErrorResponse(res, '未知的错误', 1);
-			}
+			console.error(error);
+			return ErrorResponse(res, '验证错误', 1);
 		}
 	};
 };

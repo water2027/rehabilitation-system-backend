@@ -1,4 +1,4 @@
-const { generateToken } = require('../utils/jwt');
+const eventBus = require('../utils/eventBus');
 const { generateNumericCode } = require('../utils/vCode');
 const redis = require('../database/redis');
 class UserService {
@@ -28,7 +28,7 @@ class UserService {
 	 */
 	async Login(telephone, vCode) {
 		const value = await redis.get(telephone);
-		await redis.del(telephone)
+		await redis.del(telephone);
 		if (!value) {
 			throw new Error('验证码已过期', {
 				cause: 0,
@@ -53,9 +53,10 @@ class UserService {
 		if (!user) {
 			user = await this.UserRepository.createUser({ telephone });
 		}
-		const level = user.get('level') ? user.get('level') : 0;
 
-		const token = generateToken(user.get('id'), level)
+		const resp = {};
+		await eventBus.emit('auth:generate', { id: user.id }, resp);
+		const { token } = resp;
 
 		return token;
 	}

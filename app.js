@@ -1,20 +1,29 @@
 const express = require('express');
 require('dotenv').config();
 const sequelize = require('./database/db');
-require('./model')
+require('./model');
 const RunMongoDB = require('./database/mongodb');
 const RegisterRoutes = require('./routes');
 
+const AuthService = require('./service/auth');
+const UserRepository = require('./repository/user');
+
+const eventBus = require('./utils/eventBus');
+
 const PORT = process.env.PORT || 3000;
 
-async function startServer() {
+async function main() {
 	try {
 		await RunMongoDB();
 		await sequelize.sync({ alter: true });
 		console.log('Database synchronized successfully');
-		
+
 		const app = express();
 		RegisterRoutes(app);
+
+		const authService = new AuthService(new UserRepository());
+		eventBus.register('auth', authService);
+
 		app.listen(PORT, () => {
 			console.log(`Server is running on port ${PORT}`);
 		});
@@ -23,4 +32,4 @@ async function startServer() {
 	}
 }
 
-startServer();
+main();

@@ -1,4 +1,4 @@
-const { generateToken } = require('../utils/jwt');
+const eventBus = require('../utils/eventBus');
 
 const { sequelizeWithTransaction } = require('../utils/withTransaction');
 
@@ -79,14 +79,11 @@ class PublicService {
 	}
 
 	async RefreshToken(id) {
-		const user = await this.UserRepository.findById(id);
-		if (!user) {
-			throw new Error('用户不存在', {
-				cause: 1,
-			});
-		}
-		const level = user.level ? parseInt(user.level) : 0;
-		return generateToken(id, level);
+		const resp = {};
+		await eventBus.emit('auth:generate', { id }, resp);
+		const { token } = resp;
+
+		return token;
 	}
 }
 
