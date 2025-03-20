@@ -16,7 +16,7 @@ class AuthService {
 	 */
 	async generate(req, resp) {
 		const { id } = req;
-		const user = this.UserRepository.findById(id);
+		const user = await this.UserRepository.findById(id);
 		if (!user) {
 			throw new Error('User not found');
 		}

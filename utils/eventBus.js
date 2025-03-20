@@ -32,7 +32,14 @@ class EventBus {
 		if (!this.#listeners.has(event)) {
 			return;
 		}
-		const promises = this.#listeners.get(event).map(callback => callback(...args));
+		console.log(this.#listeners);
+		// const promises = this.#listeners
+		// 	.get(event)
+		// 	.map((callback) => callback(...args));
+		const promises = [];
+		for (const callback of this.#listeners.get(event)) {
+			promises.push(callback(...args));
+		}
 		await Promise.all(promises);
 	}
 
@@ -52,12 +59,18 @@ class EventBus {
 		if (!service || typeof service !== 'object') {
 			throw new Error('Service must be an object');
 		}
+		console.log('register');
 
 		// 为服务中的每个方法注册事件
-		Object.entries(service).forEach(([methodName, method]) => {
-			if (typeof method === 'function') {
-				const eventName = `${namespace}:${methodName}`;
-				this.on(eventName, method.bind(service));
+		const prototype = Object.getPrototypeOf(service);
+		Object.getOwnPropertyNames(prototype).forEach((methodName) => {
+			// 跳过构造函数和内部方法
+			if (methodName !== 'constructor' && !methodName.startsWith('_')) {
+				const method = prototype[methodName];
+				if (typeof method === 'function') {
+					const eventName = `${namespace}:${methodName}`;
+					this.on(eventName, method.bind(service));
+				}
 			}
 		});
 	}
