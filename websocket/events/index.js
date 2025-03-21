@@ -6,14 +6,13 @@ const EVENTS = {
         SEND: 'SINGLE:SEND',
     },
     GROUP:{
-        CREATE: 'GROUP:CREATE',
         SEND: 'GROUP:SEND',
         JOIN: 'GROUP:JOIN',
-        LEAVE: 'GROUP:LEAVE',
     },
     SOS:{
         SEND: 'SOS:SEND',
         ACCEPT: 'SOS:ACCEPT',
+        RESPONSE: 'SOS:RESPONSE',
     },
 }
 

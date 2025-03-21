@@ -1,4 +1,4 @@
-const eventBus = require('../utils/eventBus');
+const eventBus = require('../../utils/eventBus');
 
 async function AuthMiddleware(socket, next) {
 	try {
