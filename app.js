@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const setupWebsocket = require('./websocket');
 require('dotenv').config();
 const sequelize = require('./database/db');
 require('./model');
@@ -9,6 +11,7 @@ const AuthService = require('./service/auth');
 const UserRepository = require('./repository/user');
 
 const eventBus = require('./utils/eventBus');
+
 
 const PORT = process.env.PORT || 3000;
 
@@ -23,6 +26,9 @@ async function main() {
 
 		const authService = new AuthService(new UserRepository());
 		eventBus.register('auth', authService);
+
+		const server = http.createServer(app);
+		setupWebsocket(server);
 
 		app.listen(PORT, () => {
 			console.log(`Server is running on port ${PORT}`);
