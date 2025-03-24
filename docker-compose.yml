@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+      - redis
+      - mongodb
+    environment:
+      - DB_NAME=old_man
+      - DB_USER=app_user     # 确保这里使用app_user
+      - DB_PASSWORD=@Ws123456
+      - DB_HOST=mysql
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_SIZE=10
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DB=old_man
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules  # 使用匿名卷更简单
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=@Ws123456
+      - MYSQL_DATABASE=old_man
+      - MYSQL_USER=app_user         # 创建app_user用户
+      - MYSQL_PASSWORD=@Ws123456
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  redis-data:
+  mongodb-data:
