@@ -32,10 +32,6 @@ class EventBus {
 		if (!this.#listeners.has(event)) {
 			return;
 		}
-		console.log(this.#listeners);
-		// const promises = this.#listeners
-		// 	.get(event)
-		// 	.map((callback) => callback(...args));
 		const promises = [];
 		for (const callback of this.#listeners.get(event)) {
 			promises.push(callback(...args));
