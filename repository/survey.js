@@ -311,9 +311,7 @@ class SurveyRepository {
 	 */
 	async submitSurveyResponse(patientId, surveyId, answers) {
 		try {
-			console.log(surveyId);
 			const survey = await Survey.findById(surveyId);
-			console.log(survey);
 			const now = new Date();
 			const start = new Date(survey.start_date);
 			const end = new Date(survey.end_date);
@@ -342,6 +340,31 @@ class SurveyRepository {
 				})),
 			});
 
+			await response.save();
+			return response;
+		} catch (error) {
+			if (error instanceof Error) {
+				throw new Error(`Failed to answer: ${error.message}`);
+			}
+			throw error;
+		}
+	}
+
+	/**
+	 * 
+	 * @param {string} survey_id 
+	 * @param {string} patient_id 
+	 * @param {string} advice 
+	 */
+	async addAdvice(survey_id, patient_id, advice) {
+		try {
+			const response = await SurveyToPatient.findOne({
+				// @ts-ignore
+				survey_id,
+				patient_id,
+			});
+			// @ts-ignore
+			response.advice = advice;
 			await response.save();
 			return response;
 		} catch (error) {
@@ -439,15 +462,17 @@ class SurveyRepository {
 	 * 
 	 * @param {string} patient_id 
 	 * @param {string} survey_id 
-	 * @returns 
+	 * @returns {Promise<number>}
 	 */
 	async existPatientAndSurvey(patient_id, survey_id) {
+		// 代码提示有问题，实际上返回的是数字
 		const result = await SurveyToPatient.count({
 			// @ts-ignore
 			patient_id,
 			survey_id,
 		});
-		return result.length > 0;
+		// @ts-ignore
+		return result;
 	}
 }
 

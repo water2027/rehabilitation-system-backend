@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 
+const jwtKey = process.env.JWT_SECRET||"qwertyuiopasdfghjklzxcvbnm";
+
 /**
  *
  * @param {string} id
@@ -23,7 +25,7 @@ function generateToken(id, expiresIn = '30d') {
 	// @ts-ignore
 	return jwt.sign(
 		payload,
-		process.env.JWT_SECRET||"qwertyuiopasdfghjklzxcvbnm",
+		jwtKey,
 		options
 	);
 }
@@ -34,7 +36,7 @@ function generateToken(id, expiresIn = '30d') {
  * @returns 
  */
 function verifyToken(token) {
-	return jwt.verify(token, process.env.JWT_SECRET);
+	return jwt.verify(token, jwtKey);
 }
 
 module.exports = {

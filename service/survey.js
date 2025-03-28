@@ -170,6 +170,22 @@ class SurveyService {
 		return 'OK';
 	}
 
+	/**
+	 * 
+	 * @param {string} id 医生id 
+	 * @param {string} surveyId 
+	 * @param {string} patientId 
+	 * @param {string} advice 意见
+	 */
+	async giveAdviceToPatient(id, surveyId, patientId, advice) {
+		const survey = await this.SurveyRepository.getSurveyById(surveyId);
+		if (survey.doctor_id != id) {
+			throw new Error('无权限');
+		}
+		await this.SurveyRepository.addAdvice(surveyId, patientId, advice);
+		return 'OK';
+	}
+
 	// patient
 
 	async getSurveyListForPatient(id, pageNumber, pageSize) {
@@ -182,7 +198,6 @@ class SurveyService {
 
 	async getSurveyForPatient(id, surveyId) {
 		const isExist = await this.SurveyRepository.existPatientAndSurvey(id, surveyId);
-		console.log(isExist)
 		if (!isExist) {
 			throw new Error('无权限');
 		}

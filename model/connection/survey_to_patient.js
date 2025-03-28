@@ -15,6 +15,11 @@ const SurveyToPatient = sequelize.define('survey_to_patient', {
 	survey_id: {
 		type: DataTypes.UUID,
 		allowNull: false,
+	},
+	advice:{
+		type: DataTypes.STRING,
+		allowNull: true,
+		defaultValue: ''
 	}
 });
 

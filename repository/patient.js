@@ -23,7 +23,6 @@ class PatientRepository {
 	 */
 	async findAuthPatient(info) {
 		const patients = await Patient.findAll({
-			where: { auth_status: true },
 			include: [
 				{
 					model: User,
@@ -36,26 +35,26 @@ class PatientRepository {
 		return patients;
 	}
 
-	/**
-	 * 获取所有未认证患者
-	 * @param {Object} info
-	 * @param {number} info.pageNumber
-	 * @param {number} info.pageSize
-	 */
-	async findUnauthPatient(info) {
-		const patients = await Patient.findAll({
-			where: { auth_status: false },
-			include: [
-				{
-					model: User,
-					required: true,
-				},
-			],
-			limit: info.pageSize,
-			offset: (info.pageNumber - 1) * info.pageSize,
-		});
-		return patients;
-	}
+	// /**
+	//  * 获取所有未认证患者
+	//  * @param {Object} info
+	//  * @param {number} info.pageNumber
+	//  * @param {number} info.pageSize
+	//  */
+	// async findUnauthPatient(info) {
+	// 	const patients = await Patient.findAll({
+	// 		where: { auth_status: false },
+	// 		include: [
+	// 			{
+	// 				model: User,
+	// 				required: true,
+	// 			},
+	// 		],
+	// 		limit: info.pageSize,
+	// 		offset: (info.pageNumber - 1) * info.pageSize,
+	// 	});
+	// 	return patients;
+	// }
 
 	/**
 	 * 根据id或者手机号获取医生

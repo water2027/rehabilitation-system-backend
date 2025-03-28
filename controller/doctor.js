@@ -191,6 +191,22 @@ class DoctorController {
 			next(err);
 		}
 	}
+
+	async giveAdvice(req, res, next) {
+		try {
+			const { id } = req.user;
+			const { patientId, surveyId, advice } = req.body;
+			const result = await this.SurveyService.giveAdviceToPatient(
+				id,
+				surveyId,
+				patientId,
+				advice
+			);
+			return SuccessResponse(res, result);
+		} catch (err) {
+			next(err);
+		}
+	}
 }
 
 module.exports = DoctorController;

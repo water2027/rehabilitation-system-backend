@@ -12,16 +12,16 @@ class AdminService {
 		this.DoctorRepository = DoctorRepository;
 		this.PatientRepository = PatientRepository;
 	}
-	/**
-	 * 获取所有未认证医生
-	 * @param {Object} info
-	 * @param {number} info.pageNumber
-	 * @param {number} info.pageSize
-	 */
-	async getAllUnauthPatient(info) {
-		const patients = await this.PatientRepository.findUnauthPatient(info);
-		return patients;
-	}
+	// /**
+	//  * 获取所有未认证患者
+	//  * @param {Object} info
+	//  * @param {number} info.pageNumber
+	//  * @param {number} info.pageSize
+	//  */
+	// async getAllUnauthPatient(info) {
+	// 	const patients = await this.PatientRepository.findUnauthPatient(info);
+	// 	return patients;
+	// }
 
 	/**
 	 * 获取所有未认证医生

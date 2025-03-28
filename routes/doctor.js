@@ -45,6 +45,9 @@ router.post('/survey/add-patients', (req, res, next) =>
 router.post('/survey/', (req, res, next) =>
 	doctorController.getSurveyById(req, res, next)
 );
+router.post('/survey/advice', (req, res, next) =>
+	doctorController.giveAdvice(req, res, next)
+);
 
 router.put('/survey/', (req, res, next) =>
 	doctorController.updateSurvey(req, res, next)
