@@ -1,19 +1,24 @@
 /* eslint-disable n/no-process-exit */
-const Redis = require('ioredis');
+const Redis = require('ioredis').default;
 
 class RedisPool {
+	/**
+	 * @type {Redis[]}
+	 */
+	connections;
 	/**
 	 *
 	 * @param {Object} options
 	 * @param {number} options.size
 	 * @param {string} options.host
 	 * @param {number} options.port
-	 * @param {number} options.db
-	 * @param {number} options.connectTimeout
-	 * @param {number} options.maxRetriesPerRequest
+	 * @param {string} options.password
+	 * @param {number} [options.db]
+	 * @param {number} [options.connectTimeout]
+	 * @param {number} [options.maxRetriesPerRequest]
 	 *
 	 */
-	constructor(options = {}) {
+	constructor(options) {
 		const poolSize = options.size || 10;
 		this.connections = [];
 		this.options = options;
@@ -86,13 +91,13 @@ class RedisPool {
 		return connection;
 	}
 
-  /**
-   * 设置键值对，支持过期时间
-   * @param {string|number} key - 键
-   * @param {any} value - 值
-   * @param {number} [expire] - 过期时间（秒）
-   * @returns {Promise<string>} - 操作结果，成功是 OK
-   */
+	/**
+	 * 设置键值对，支持过期时间
+	 * @param {string} k - 键
+	 * @param {any} v - 值
+	 * @param {number} [expire] - 过期时间（秒）
+	 * @returns {Promise<string>} - 操作结果，成功是 OK
+	 */
 	set(k, v, expire = undefined) {
 		let key = k;
 		let value = v;
@@ -107,39 +112,49 @@ class RedisPool {
 	}
 
 	/**
-	 * 
-	 * @param {string|number} key - 键
-	 * @returns {Promise<string|null>} - 对应的值，不存在时返回null
+	 *
+	 * @param {string} key - 键
+	 * @returns  - 对应的值，如果是对象会自动解析
 	 */
-	get(key) {
+	async get(key) {
 		const connection = this.#getConnection();
-		return connection.get(key);
+		const value = await connection.get(key);
+		if (value === null) {
+			return null;
+		}
+		try {
+			return JSON.parse(value);
+		// eslint-disable-next-line no-unused-vars
+		} catch (e) {
+			return value;
+		}
 	}
 
-	  /**
-   * 删除键
-   * @param {string|number} key - 键
-   * @returns {Promise<number>} - 删除的键数量
-   */
+	/**
+	 * 删除键
+	 * @param {string} key - 键
+	 * @returns - 删除的键数量
+	 */
 	del(key) {
 		const connection = this.#getConnection();
 		return connection.del(key);
 	}
 
-	  /**
-   * 检查键是否存在
-   * @param {string|number} key - 键
-   * @returns {Promise<number>} - 存在的键数量
-   */
-	  async exists(key) {
+	/**
+	 * 检查键是否存在
+	 * @param {string} key - 键
+	 * @returns - 存在的键数量
+	 */
+	async exists(key) {
 		const connection = this.#getConnection();
-		return connection.exists(key);
-	  }
+		const count = await connection.exists(key);
+		return count > 0;
+	}
 }
 
 module.exports = new RedisPool({
 	host: process.env.REDIS_HOST,
-	port: process.env.REDIS_PORT,
+	port: parseInt(process.env.REDIS_PORT),
 	password: process.env.REDIS_PASSWORD,
-	poolSize: process.env.REDIS_SIZE,
+	size: parseInt(process.env.REDIS_SIZE),
 });
