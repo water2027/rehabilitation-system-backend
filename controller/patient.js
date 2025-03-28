@@ -1,6 +1,11 @@
 const { SuccessResponse } = require('../dto');
 
 class PatientController {
+	/**
+	 * 
+	 * @param {import('../service/patient')} PatientService 
+	 * @param {import('../service/survey')} SurveyService 
+	 */
 	constructor(PatientService, SurveyService) {
 		this.PatientService = PatientService;
 		this.SurveyService = SurveyService;

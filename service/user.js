@@ -2,6 +2,10 @@ const eventBus = require('../utils/eventBus');
 const { generateNumericCode } = require('../utils/vCode');
 const redis = require('../database/redis');
 class UserService {
+	/**
+	 * 
+	 * @param {import('../repository/user')} UserRepository 
+	 */
 	constructor(UserRepository) {
 		this.UserRepository = UserRepository;
 	}
@@ -24,12 +28,13 @@ class UserService {
 	 *
 	 * @param {string} telephone
 	 * @param {string} vCode
-	 * @returns {string} token
+	 * @returns {Promise<string>} token
 	 */
 	async Login(telephone, vCode) {
 		const value = await redis.get(telephone);
 		await redis.del(telephone);
 		if (!value) {
+			// @ts-ignore
 			throw new Error('验证码已过期', {
 				cause: 0,
 			});
@@ -38,12 +43,14 @@ class UserService {
 		const data = JSON.parse(value);
 
 		if (data.type !== 'login') {
+			// @ts-ignore
 			throw new Error('验证码类型错误', {
 				cause: 0,
 			});
 		}
 
 		if (data.code !== vCode) {
+			// @ts-ignore
 			throw new Error('验证码错误', {
 				cause: 0,
 			});
@@ -55,6 +62,7 @@ class UserService {
 		}
 
 		const resp = {};
+		// @ts-ignore
 		await eventBus.emit('auth:generate', { id: user.id }, resp);
 		const { token } = resp;
 

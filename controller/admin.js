@@ -1,6 +1,10 @@
 const { SuccessResponse } = require('../dto');
 
 class AdminController {
+	/**
+	 * 
+	 * @param {import('../service/admin')} AdminService 
+	 */
 	constructor(AdminService) {
 		this.AdminService = AdminService;
 	}

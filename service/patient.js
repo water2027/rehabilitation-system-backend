@@ -1,4 +1,8 @@
 class PatientService {
+	/**
+	 * 
+	 * @param {import('../repository/doctor')} DoctorRepository 
+	 */
 	constructor(DoctorRepository) {
 		this.DoctorRepository = DoctorRepository;
 	}

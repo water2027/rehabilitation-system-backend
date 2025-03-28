@@ -1,9 +1,11 @@
 const { SuccessResponse } = require('../dto');
-const PublicService = require('../service/public');
 
 class PublicController {
-	constructor() {
-		this.PublicService = new PublicService()
+	/**
+	 * @param {import('../service/public')} PublicService 
+	 */
+	constructor(PublicService) {
+		this.PublicService = PublicService;
 	}
 	async PatientRegister(req, res, next) {
 		try {
@@ -86,4 +88,4 @@ class PublicController {
 	}
 }
 
-module.exports = new PublicController();
+module.exports = PublicController;

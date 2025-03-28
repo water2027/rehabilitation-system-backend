@@ -1,6 +1,10 @@
 const { mongoWithTransaction } = require('../utils/withTransaction');
 
 class SurveyService {
+	/**
+	 * 
+	 * @param {import('../repository/survey')} SurveyRepository 
+	 */
 	constructor(SurveyRepository) {
 		this.SurveyRepository = SurveyRepository;
 	}
@@ -170,7 +174,6 @@ class SurveyService {
 	// patient
 
 	async getSurveyListForPatient(id, pageNumber, pageSize) {
-		console.log(id)
 		const result = await this.SurveyRepository.getSurveyListForPatient(id, {
 			pageNumber,
 			pageSize,
@@ -194,6 +197,7 @@ class SurveyService {
 	 * @param {string} surveyId - 问卷id
 	 * @param {Object[]} answers - 答卷
 	 * @param {string} answers[].question_id
+	 * @param {string} answers[].question_type
 	 * @param {string} [answers[].single_choice_answer]
 	 * @param {string[]} [answers[].multiple_choice_answers]
 	 * @param {string} [answers[].text_answer]
@@ -206,7 +210,7 @@ class SurveyService {
 
 	/** 获取患者的问卷结果
 	 *
-	 * @param {string} id - 患者id
+	 * @param {string} patient_id - 患者id
 	 * @param {string} surveyId - 问卷id
 	 * @returns
 	 */

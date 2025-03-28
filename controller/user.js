@@ -1,6 +1,10 @@
 const { SuccessResponse, ErrorResponse } = require('../dto/index');
 
 class UserController {
+	/**
+	 * 
+	 * @param {import('../service/user')} UserService 
+	 */
 	constructor(UserService) {
 		this.UserService = UserService;
 	}

@@ -305,7 +305,6 @@ class SurveyRepository {
 	 * @param {Object[]} answers - 答卷
 	 * @param {string} answers[].question_id
 	 * @param {string} answers[].question_type
-	 * @param {string} answers[].question_type
 	 * @param {string} [answers[].single_choice_answer]
 	 * @param {string[]} [answers[].multiple_choice_answers]
 	 * @param {string} [answers[].text_answer]
@@ -405,13 +404,14 @@ class SurveyRepository {
 	}
 
 	async getSurveyListForPatient(patientId, info) {
-		console.log(patientId);
 		// 获取患者的问卷列表id
 		const connections = await SurveyToPatient.findAll({
+			// @ts-ignore
 			patient_id: patientId,
 		});
 		console.log(connections);
 		// 根据问卷id获取问卷详情
+		// @ts-ignore
 		const surveyIds = connections.map((survey) => survey.survey_id);
 		if (surveyIds.length === 0) {
 			return [];
@@ -426,10 +426,12 @@ class SurveyRepository {
 
 	async existPatientAndSurvey(patient_id, survey_id) {
 		const result = await SurveyToPatient.count({
+			// @ts-ignore
 			patient_id,
 			survey_id,
 		});
-		return result > 0;
+		console.log(result);
+		return result.length > 0;
 	}
 }
 

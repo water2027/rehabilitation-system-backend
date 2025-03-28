@@ -2,15 +2,19 @@ const eventBus = require('../utils/eventBus');
 
 const { sequelizeWithTransaction } = require('../utils/withTransaction');
 
-const DoctorRepository = require('../repository/doctor');
-const UserRepository = require('../repository/user');
-const AuthRepository = require('../repository/admin');
-const PatientRepository = require('../repository/patient');
-
 class PublicService {
-	constructor() {
-		this.PatientRepository = new PatientRepository();
-		this.UserRepository = new UserRepository();
+	/**
+	 * 
+	 * @param {import('../repository/admin')} AdminRepository 
+	 * @param {import('../repository/doctor')} DoctorRepository
+	 * @param {import('../repository/patient')} PatientRepository 
+	 * @param {import('../repository/user')} UserRepository 
+	 */
+	constructor(AdminRepository, DoctorRepository, PatientRepository, UserRepository) {
+		this.AdminRepository = AdminRepository;
+		this.DoctorRepository = DoctorRepository;
+		this.PatientRepository = PatientRepository;
+		this.UserRepository = UserRepository;
 	}
 	/**
 	 * @param {Object} info - The registration parameters for the doctor
@@ -29,12 +33,14 @@ class PublicService {
 		return await execute(async () => {
 			const user = await this.UserRepository.findById(info.patient_id);
 			if (!user) {
+				// @ts-ignore
 				throw new Error('User not found', {
 					cause: 1,
 				});
 			}
 			await this.PatientRepository.createPatient(info);
 
+			// @ts-ignore
 			user.level = 1;
 			await user.save();
 		});
@@ -48,16 +54,16 @@ class PublicService {
 	 * @param {string} info.introduction - 个人简介
 	 * @param {string} info.name - 名字
 	 * @param {string} info.department - 科室
-	 * @param {undefined} info.auth_status - 不应该出现的字段
 	 */
 	async DoctorRegister(info) {
 		const user = await this.UserRepository.findById(info.doctor_id);
 		if (!user) {
+			// @ts-ignore
 			throw new Error('User not found', {
 				cause: 1,
 			});
 		}
-		await DoctorRepository.createDoctor(info);
+		await this.DoctorRepository.createDoctor(info);
 		return '注册成功，请等待审核';
 	}
 
@@ -70,11 +76,12 @@ class PublicService {
 	async AuthRegister(info) {
 		const user = await this.UserRepository.findById(info.auth_id);
 		if (!user) {
+			// @ts-ignore
 			throw new Error('User not found', {
 				cause: 1,
 			});
 		}
-		await AuthRepository.createAuth(info);
+		await this.AdminRepository.createAdmin(info);
 		return '注册成功，请等待审核';
 	}
 
