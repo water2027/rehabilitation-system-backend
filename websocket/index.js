@@ -1,5 +1,7 @@
-const socketIO = require('socket.io');
+const { Server } = require('socket.io');
 const AuthMiddleware = require('./middlewares/auth');
+const DoctorRoomMiddleware = require('./middlewares/doctorRoom');
+const setupEventHandler = require('./handlers');
 // const eventBus = require('../utils/eventBus');
 
 /**
@@ -11,7 +13,7 @@ const AuthMiddleware = require('./middlewares/auth');
 
 
 function setupWebsocket(server) {
-	const io = socketIO(server, {
+	const io = new Server(server, {
 		cors: {
 			origin: '*',
 			methods: ['GET', 'POST'],
@@ -19,9 +21,14 @@ function setupWebsocket(server) {
 	});
 
 	io.use(AuthMiddleware);
-
+	io.use(DoctorRoomMiddleware);
+	
 	io.on('connection', (socket) => {
+		// @ts-ignore
 		console.log(`用户${socket.user.id}已连接, 连接ID: ${socket.id}`);
+		
+		setupEventHandler(io, socket);
+
 		socket.on('disconnect', () => {
 			console.log('Disconnected:', socket.id);
 		});
