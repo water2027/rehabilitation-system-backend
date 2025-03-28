@@ -353,7 +353,7 @@ class SurveyRepository {
 	}
 
 	/**
-	 * 获取一个问卷的答卷
+	 * 获取一个问卷的所有答卷
 	 * @param {string} surveyId - ID of the survey
 	 */
 	async getSurveyResponses(surveyId) {
@@ -362,7 +362,6 @@ class SurveyRepository {
 				survey_id: surveyId,
 			}).populate({
 				path: 'answers.question_id',
-				// No need to specify model here as it's defined in the schema ref
 			});
 			return responses;
 		} catch (error) {
@@ -393,6 +392,11 @@ class SurveyRepository {
 		}
 	}
 
+	/** 将问卷分配给患者
+	 * 
+	 * @param {string} surveyId 
+	 * @param {string[]} patients 
+	 */
 	async addPatientsToSurvey(surveyId, patients) {
 		// 插入患者和问卷的关联
 		const connections = patients.map((patientId) => ({
@@ -403,13 +407,20 @@ class SurveyRepository {
 		await SurveyToPatient.bulkCreate(connections);
 	}
 
+	/**
+	 * 
+	 * @param {string} patientId 
+	 * @param {Object} info 
+	 * @param {number} info.pageNumber
+	 * @param {number} info.pageSize 
+	 * @returns 
+	 */
 	async getSurveyListForPatient(patientId, info) {
 		// 获取患者的问卷列表id
 		const connections = await SurveyToPatient.findAll({
 			// @ts-ignore
 			patient_id: patientId,
 		});
-		console.log(connections);
 		// 根据问卷id获取问卷详情
 		// @ts-ignore
 		const surveyIds = connections.map((survey) => survey.survey_id);
@@ -424,13 +435,18 @@ class SurveyRepository {
 		return surveyList;
 	}
 
+	/** 检查患者是否与问卷有关联
+	 * 
+	 * @param {string} patient_id 
+	 * @param {string} survey_id 
+	 * @returns 
+	 */
 	async existPatientAndSurvey(patient_id, survey_id) {
 		const result = await SurveyToPatient.count({
 			// @ts-ignore
 			patient_id,
 			survey_id,
 		});
-		console.log(result);
 		return result.length > 0;
 	}
 }

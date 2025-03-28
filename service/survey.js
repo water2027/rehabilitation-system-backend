@@ -96,7 +96,7 @@ class SurveyService {
 	 *
 	 * @param {string} id - 医生id
 	 * @param {string} surveyId - 问卷id
-	 * @returns
+	 * @returns 带有患者答案的问卷数组
 	 */
 	async getSurveyResult(id, surveyId) {
 		const survey = await this.SurveyRepository.getSurveyById(surveyId);
@@ -124,7 +124,6 @@ class SurveyService {
 	 */
 	async deleteSurvey(id, surveyId) {
 		const survey = await this.SurveyRepository.getSurveyById(surveyId);
-		console.log(survey);
 		if (!survey) {
 			throw new Error('问卷不存在');
 		}
