@@ -4,6 +4,11 @@ class EventBus {
 		this.#listeners = new Map();
 	}
 
+	/**
+	 * 
+	 * @param {string} event 事件名
+	 * @param {(arg0:any[])=>void} callback 回调函数
+	 */
 	on(event, callback) {
 		if (typeof event !== 'string' || typeof callback !== 'function') {
 			throw new Error(
@@ -16,6 +21,11 @@ class EventBus {
 		this.#listeners.get(event).add(callback);
 	}
 
+	/**
+	 * 
+	 * @param {string} event 事件名
+	 * @param {(arg0:any[])=>void} callback 回调函数
+	 */
 	off(event, callback) {
 		if (typeof event !== 'string' || typeof callback !== 'function') {
 			throw new Error(
@@ -28,6 +38,12 @@ class EventBus {
 		this.#listeners.get(event).delete(callback);
 	}
 
+	/**
+	 * 
+	 * @param {string} event 
+	 * @param  {...any} args 
+	 * @returns 
+	 */
 	async emit(event, ...args) {
 		if (!this.#listeners.has(event)) {
 			return;

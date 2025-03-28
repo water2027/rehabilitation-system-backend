@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 const sequelize = require('../database/db');
 
+/**
+ * 
+ * @returns {(fn:()=>Promise<any>)=>Promise<any>}
+ * @description sequelizeWithTransaction 用于 sequelize 的事务处理
+ */
 function sequelizeWithTransaction() {
 	return async function (fn) {
 		await sequelize.query('START TRANSACTION');
@@ -15,6 +20,11 @@ function sequelizeWithTransaction() {
 	};
 }
 
+/**
+ * 
+ * @returns {(fn:()=>Promise<any>)=>Promise<any>}
+ * @description mongoWithTransaction 用于 mongoose 的事务处理
+ */
 function mongoWithTransaction() {
 	return async function (fn) {
 		const session = await mongoose.startSession();

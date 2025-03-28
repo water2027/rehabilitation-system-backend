@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 /**
  *
  * @param {string} id
- * @param {number} level 0未认证 1用户 2医生 3管理员
  * @param {string} expiresIn 默认 30d
  * 	- `${value}d`
  * @returns {string} token
@@ -21,6 +20,7 @@ function generateToken(id, expiresIn = '30d') {
 	const options = {
 		expiresIn,
 	}
+	// @ts-ignore
 	return jwt.sign(
 		payload,
 		process.env.JWT_SECRET||"qwertyuiopasdfghjklzxcvbnm",
