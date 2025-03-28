@@ -351,17 +351,16 @@ class SurveyRepository {
 	}
 
 	/**
-	 * 
-	 * @param {string} survey_id 
-	 * @param {string} patient_id 
-	 * @param {string} advice 
+	 *
+	 * @param {string} survey_id
+	 * @param {string} patient_id
+	 * @param {string} advice
 	 */
 	async addAdvice(survey_id, patient_id, advice) {
 		try {
 			const response = await SurveyToPatient.findOne({
 				// @ts-ignore
-				survey_id,
-				patient_id,
+				where: { survey_id, patient_id },
 			});
 			// @ts-ignore
 			response.advice = advice;
@@ -403,8 +402,7 @@ class SurveyRepository {
 	async getPatientSurveyResponse(patientId, surveyId) {
 		try {
 			const response = await Response.findOne({
-				survey_id: surveyId,
-				patient_id: patientId,
+				where: { survey_id: surveyId, patient_id: patientId },
 			});
 			return response;
 		} catch (error) {
@@ -416,9 +414,9 @@ class SurveyRepository {
 	}
 
 	/** 将问卷分配给患者
-	 * 
-	 * @param {string} surveyId 
-	 * @param {string[]} patients 
+	 *
+	 * @param {string} surveyId
+	 * @param {string[]} patients
 	 */
 	async addPatientsToSurvey(surveyId, patients) {
 		// 插入患者和问卷的关联
@@ -431,12 +429,12 @@ class SurveyRepository {
 	}
 
 	/**
-	 * 
-	 * @param {string} patientId 
-	 * @param {Object} info 
+	 *
+	 * @param {string} patientId
+	 * @param {Object} info
 	 * @param {number} info.pageNumber
-	 * @param {number} info.pageSize 
-	 * @returns 
+	 * @param {number} info.pageSize
+	 * @returns
 	 */
 	async getSurveyListForPatient(patientId, info) {
 		// 获取患者的问卷列表id
@@ -459,9 +457,9 @@ class SurveyRepository {
 	}
 
 	/** 检查患者是否与问卷有关联
-	 * 
-	 * @param {string} patient_id 
-	 * @param {string} survey_id 
+	 *
+	 * @param {string} patient_id
+	 * @param {string} survey_id
 	 * @returns {Promise<number>}
 	 */
 	async existPatientAndSurvey(patient_id, survey_id) {
@@ -476,16 +474,19 @@ class SurveyRepository {
 	}
 
 	/**
-	 * 
-	 * @param {string} survey_id 
-	 * @param {string} patient_id 
+	 *
+	 * @param {string} survey_id
+	 * @param {string} patient_id
 	 */
-	async getAdvice(survey_id, patient_id) {
+	async getAdvice(patient_id, survey_id) {
+		console.log(survey_id, patient_id);
 		const response = await SurveyToPatient.findOne({
-			// @ts-ignore
-			survey_id,
-			// @ts-ignore
-			patient_id,
+			where: {
+				// @ts-ignore
+				survey_id,
+				// @ts-ignore
+				patient_id,
+			},
 		});
 		// @ts-ignore
 		return response.advice;
