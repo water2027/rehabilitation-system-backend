@@ -474,6 +474,22 @@ class SurveyRepository {
 		// @ts-ignore
 		return result;
 	}
+
+	/**
+	 * 
+	 * @param {string} survey_id 
+	 * @param {string} patient_id 
+	 */
+	async getAdvice(survey_id, patient_id) {
+		const response = await SurveyToPatient.findOne({
+			// @ts-ignore
+			survey_id,
+			// @ts-ignore
+			patient_id,
+		});
+		// @ts-ignore
+		return response.advice;
+	}
 }
 
 module.exports = SurveyRepository;

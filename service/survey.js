@@ -238,6 +238,11 @@ class SurveyService {
 		}
 		return result;
 	}
+
+	async getAdvice(patientId, surveyId) {
+		const result = await this.SurveyRepository.getAdvice(patientId, surveyId);
+		return result;
+	}
 }
 
 module.exports = SurveyService;

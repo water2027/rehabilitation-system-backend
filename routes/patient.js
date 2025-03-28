@@ -36,4 +36,8 @@ router.post('/survey/result', (req, res, next) =>
 	patientController.getSurveyResult(req, res, next)
 );
 
+router.post('/survey/get-advice', (req, res, next) =>
+	patientController.getAdvice(req, res, next)
+);
+
 module.exports = router;

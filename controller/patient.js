@@ -87,6 +87,18 @@ class PatientController {
 			next(err);
 		}
 	}
+
+	async getAdvice(req, res, next) {
+		try {
+			const { id } = req.user;
+			const { surveyId } = req.body;
+			const result = await this.SurveyService.getAdvice(id, surveyId);
+			return SuccessResponse(res, result);
+		} catch (err) {
+			next(err);
+		}
+	}
+	
 }
 
 module.exports = PatientController;
